@@ -1,5 +1,11 @@
 services:
   jukebox:
+    # image + build together: `docker compose build` (local dev/testing)
+    # builds and tags this image locally; on the deployment server, `docker
+    # compose pull` grabs the pre-built image from GHCR instead (see
+    # .github/workflows/docker-publish.yml) - no source checkout or build
+    # toolchain needed there, just this file and backend/.env.
+    image: ghcr.io/swivelingtoast/kids-tunes:latest
     build: .
     ports:
       - '3001:3001'
