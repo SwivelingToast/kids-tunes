@@ -30,6 +30,13 @@ export default defineConfig({
         // no runtime Google Fonts caching needed since nothing calls out
         // to Google's CDN anymore.
         globPatterns: ['**/*.{js,css,html,woff2,png,svg}'],
+        // Without this, Workbox's SPA navigation fallback (serving the
+        // cached app shell for any full-page navigation, so client-side
+        // routes work offline) also swallows /api/* routes like the
+        // Spotify OAuth login/callback redirects - those are real backend
+        // endpoints on the same origin now, not app pages, and must
+        // actually reach the server.
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],
