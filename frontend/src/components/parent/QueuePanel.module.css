@@ -1,0 +1,126 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 640px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summary {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+}
+
+.summaryActions {
+  display: flex;
+  gap: 8px;
+}
+
+.nowPlayingStrip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.npArt {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.npInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.npTitle {
+  font-size: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.npMeta {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.empty {
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-divider);
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #e9e9ed 4%, transparent);
+}
+
+.index {
+  width: 24px;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  text-align: center;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+
+.rowArt {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.rowInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMeta {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}

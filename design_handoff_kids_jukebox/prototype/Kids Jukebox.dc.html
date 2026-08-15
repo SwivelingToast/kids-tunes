@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-9c24eb85-2a3e-4a22-993a-46792593e77d/styles.css">
+<script src="_ds/nocturne-9c24eb85-2a3e-4a22-993a-46792593e77d/_ds_bundle.js"></script>
+<style>
+html,body{margin:0;background:#0e0f18}
+@keyframes npGlow{0%,100%{opacity:.55}50%{opacity:.85}}
+@keyframes riseIn{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bar1{0%,100%{height:8px}50%{height:22px}}
+@keyframes bar2{0%,100%{height:20px}50%{height:9px}}
+@keyframes bar3{0%,100%{height:13px}50%{height:24px}}
+.jb-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.jb-scroll::-webkit-scrollbar{display:none}
+.jb-tile:active{transform:scale(.96)}
+.jb-tile{transition:transform .12s ease}
+</style>
+</helmet>
+
+<div style="width:800px;height:1280px;position:relative;overflow:hidden;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);display:flex;flex-direction:column">
+
+<sc-if value="{{ isKid }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column">
+
+<div style="position:relative;flex:none;padding:26px 28px 22px;background:var(--color-surface);box-shadow:0 12px 34px rgba(0,0,0,.5)">
+  <div style="position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(to right,transparent,var(--color-divider) 48px,var(--color-divider) calc(100% - 48px),transparent)"></div>
+  <sc-if value="{{ glowOn }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:-60px;top:-120px;width:420px;height:340px;border-radius:50%;background:radial-gradient(circle,#5d5294,transparent 68%);filter:blur(30px);animation:npGlow 6s ease-in-out infinite;pointer-events:none"></div>
+  </sc-if>
+  <div style="position:relative;display:flex;gap:22px;align-items:center">
+    <div style="width:158px;height:158px;flex:none;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);display:grid;place-items:center;overflow:hidden">
+      <div style="{{ npArtStyle }}">
+        <svg width="58" height="58" viewBox="0 0 256 256" fill="none" stroke="#e9e9ed" stroke-opacity=".38" stroke-width="14" stroke-linecap="round"><circle cx="76" cy="188" r="34"/><circle cx="196" cy="160" r="34"/><path d="M110 188V72l120-28v116"/></svg>
+      </div>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent)">{{ npKicker }}</span>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:24px">
+          <sc-if value="{{ playing }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:flex-end;gap:3px;height:24px">
+              <span style="width:3px;background:var(--color-accent-400);border-radius:2px;animation:bar1 .9s ease-in-out infinite"></span>
+              <span style="width:3px;background:var(--color-accent-400);border-radius:2px;animation:bar2 .9s ease-in-out infinite"></span>
+              <span style="width:3px;background:var(--color-accent-400);border-radius:2px;animation:bar3 .9s ease-in-out infinite"></span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <div style="font-family:var(--font-heading);font-weight:500;font-size:40px;line-height:1.06;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ npTitle }}</div>
+      <div style="font-size:22px;color:color-mix(in srgb,var(--color-text) 60%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ npArtist }}</div>
+    </div>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;gap:14px;margin-top:22px">
+    <span style="font-size:15px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 55%,transparent);width:52px">{{ npPos }}</span>
+    <div style="flex:1;height:10px;border-radius:6px;background:color-mix(in srgb,var(--color-text) 12%,transparent);overflow:hidden">
+      <div style="{{ npBarStyle }}"></div>
+    </div>
+    <span style="font-size:15px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 55%,transparent);width:52px;text-align:right">{{ npLen }}</span>
+  </div>
+
+  <div style="position:relative;display:flex;align-items:center;gap:18px;margin-top:20px">
+    <button onClick="{{ togglePlay }}" aria-label="Play or pause" style="width:96px;height:96px;flex:none;border-radius:50%;cursor:pointer;display:grid;place-items:center;background:color-mix(in srgb,var(--color-accent) 14%,transparent);border:2px solid var(--color-accent);color:var(--color-accent)" style-active="background:color-mix(in srgb,var(--color-accent) 28%,transparent)">
+      <sc-if value="{{ playing }}" hint-placeholder-val="{{ true }}">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1.6"/><rect x="14" y="4" width="4.5" height="16" rx="1.6"/></svg>
+      </sc-if>
+      <sc-if value="{{ paused }}" hint-placeholder-val="{{ false }}">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.6c0-1 1.1-1.6 1.9-1.1l10 6.4c.8.5.8 1.7 0 2.2l-10 6.4c-.8.5-1.9-.1-1.9-1.1V4.6Z"/></svg>
+      </sc-if>
+    </button>
+    <button onPointerDown="{{ skipDown }}" onPointerUp="{{ skipUp }}" onPointerLeave="{{ skipUp }}" onPointerCancel="{{ skipUp }}" aria-label="Hold to skip to the next song" style="position:relative;width:88px;height:88px;flex:none;border-radius:50%;cursor:pointer;display:grid;place-items:center;background:transparent;border:1px solid var(--color-divider);color:var(--color-text);touch-action:none;user-select:none">
+      <svg width="88" height="88" viewBox="0 0 88 88" style="position:absolute;inset:0;transform:rotate(-90deg);pointer-events:none">
+        <circle cx="44" cy="44" r="42" fill="none" stroke="{{ skipRingStroke }}" stroke-width="4" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="{{ skipRingOffset }}"></circle>
+      </svg>
+      <span style="position:relative;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5.4c0-.9 1-1.4 1.7-1L17 10c.7.4.7 1.4 0 1.8l-9.3 5.7c-.7.4-1.7-.1-1.7-1V5.4Z"/><rect x="17.6" y="4.5" width="3" height="15" rx="1.4"/></svg>
+        <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Hold</span>
+      </span>
+    </button>
+    <div style="flex:1"></div>
+    <button onClick="{{ openFav }}" aria-label="Add to favorites" style="height:88px;padding:0 26px;border-radius:44px;cursor:pointer;display:flex;align-items:center;gap:14px;background:color-mix(in srgb,var(--color-accent) 10%,transparent);border:1px solid var(--color-accent);color:var(--color-accent)" style-active="background:color-mix(in srgb,var(--color-accent) 24%,transparent)">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="{{ npStarFill }}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.4 4.3 1.1 6.1-5.5-3-5.5 3 1.1-6.1L3.2 9.6l6.1-.8L12 3.2Z"/></svg>
+      <span style="font-family:var(--font-heading);font-weight:500;font-size:24px">{{ npFavLabel }}</span>
+    </button>
+  </div>
+</div>
+
+<div style="flex:none;display:flex;gap:12px;padding:20px 28px 14px">
+  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+    <button onClick="{{ t.onTap }}" style="{{ t.style }}">
+      <span>{{ t.label }}</span>
+    </button>
+  </sc-for>
+</div>
+
+<div class="jb-scroll" style="flex:1;padding:8px 28px 34px">
+  <sc-if value="{{ showArtistBack }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ clearArtist }}" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 20px;border-radius:var(--radius-md);background:transparent;border:1px solid var(--color-divider);color:var(--color-text);font-family:var(--font-heading);font-size:19px;cursor:pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"/></svg>
+      All artists
+    </button>
+  </sc-if>
+
+  <sc-if value="{{ showKidPicker }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;gap:10px;margin-bottom:18px">
+      <sc-for list="{{ kidChips }}" as="k" hint-placeholder-count="4">
+        <button onClick="{{ k.onTap }}" style="{{ k.style }}">{{ k.name }}</button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px">
+    <span style="font-family:var(--font-heading);font-weight:500;font-size:22px">{{ gridHeading }}</span>
+    <span style="font-size:15px;color:color-mix(in srgb,var(--color-text) 45%,transparent)">{{ gridCount }}</span>
+  </div>
+
+  <sc-if value="{{ gridEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 20px;border-radius:var(--radius-lg);border:1px dashed var(--color-divider);text-align:center;font-size:19px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">{{ emptyText }}</div>
+  </sc-if>
+
+  <div style="{{ gridStyle }}">
+    <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="9">
+      <button class="jb-tile" onClick="{{ t.onTap }}" style="padding:0;border:0;background:transparent;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;color:var(--color-text)">
+        <div style="position:relative;width:100%;aspect-ratio:1;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);display:grid;place-items:center">
+          <span style="{{ t.artStyle }}"></span>
+          <svg style="position:relative" width="46" height="46" viewBox="0 0 256 256" fill="none" stroke="#e9e9ed" stroke-opacity=".3" stroke-width="14" stroke-linecap="round"><circle cx="76" cy="188" r="34"/><circle cx="196" cy="160" r="34"/><path d="M110 188V72l120-28v116"/></svg>
+          <sc-if value="{{ t.starred }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;background:color-mix(in srgb,var(--color-bg) 72%,transparent);display:grid;place-items:center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#b5abfc"><path d="M12 3.2l2.7 5.6 6.1.8-4.4 4.3 1.1 6.1-5.5-3-5.5 3 1.1-6.1L3.2 9.6l6.1-.8L12 3.2Z"/></svg>
+            </span>
+          </sc-if>
+          <sc-if value="{{ t.isArtist }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent-200);background:linear-gradient(transparent,rgba(0,0,0,.55))">{{ t.sub }}</span>
+          </sc-if>
+        </div>
+        <span style="font-family:var(--font-heading);font-weight:500;font-size:21px;line-height:1.15;text-wrap:pretty">{{ t.title }}</span>
+        <span style="font-size:16px;color:color-mix(in srgb,var(--color-text) 52%,transparent);line-height:1.2">{{ t.sub2 }}</span>
+      </button>
+    </sc-for>
+  </div>
+</div>
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:50%;bottom:34px;transform:translateX(-50%);padding:16px 28px;border-radius:44px;background:var(--color-surface);box-shadow:var(--shadow-lg);font-family:var(--font-heading);font-size:21px;animation:riseIn .22s ease-out;white-space:nowrap">{{ toast }}</div>
+</sc-if>
+
+<div onPointerDown="{{ secretDown }}" onPointerUp="{{ secretUp }}" onPointerLeave="{{ secretUp }}" style="position:absolute;top:0;right:0;width:96px;height:96px;z-index:5"></div>
+<sc-if value="{{ pressing }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;top:14px;right:14px;width:20px;height:20px;border-radius:50%;background:var(--color-accent-700);pointer-events:none;z-index:4"></div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ showFav }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:20;display:grid;place-items:center;padding:40px;background:color-mix(in srgb,#0e0f18 72%,transparent)">
+  <div style="width:100%;max-width:600px;display:flex;flex-direction:column;gap:var(--space-4);padding:30px;border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-lg);animation:popIn .18s ease-out">
+    <div>
+      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent);margin-bottom:6px">Add to favorites</div>
+      <div style="font-family:var(--font-heading);font-weight:500;font-size:30px;line-height:1.1">{{ npTitle }}</div>
+      <div style="font-size:18px;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin-top:4px">Whose favorite is this?</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ favRows }}" as="k" hint-placeholder-count="4">
+        <button onClick="{{ k.onTap }}" style="{{ k.style }}">
+          <span style="{{ k.avatarStyle }}">{{ k.initial }}</span>
+          <span style="flex:1;font-family:var(--font-heading);font-weight:500;font-size:25px">{{ k.name }}</span>
+          <span style="font-size:16px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">{{ k.hint }}</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="{{ k.starFill }}" stroke="{{ k.starStroke }}" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.4 4.3 1.1 6.1-5.5-3-5.5 3 1.1-6.1L3.2 9.6l6.1-.8L12 3.2Z"/></svg>
+        </button>
+      </sc-for>
+    </div>
+    <button class="btn btn-secondary" onClick="{{ closeFav }}" style="height:58px;font-size:20px;border-radius:var(--radius-lg)">Close</button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPin }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:30;background:var(--color-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-6);padding:60px">
+  <div style="position:absolute;top:-140px;width:520px;height:420px;border-radius:50%;background:radial-gradient(circle,#2b2741,transparent 70%);filter:blur(28px);pointer-events:none"></div>
+  <div style="position:relative;text-align:center">
+    <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:10px">Grown-ups only</div>
+    <h2 style="margin:0">Enter your PIN</h2>
+    <div style="font-size:15px;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin-top:6px">{{ pinHint }}</div>
+  </div>
+  <div style="position:relative;display:flex;gap:16px">
+    <sc-for list="{{ pinDots }}" as="d" hint-placeholder-count="4">
+      <span style="width:26px;height:26px;border-radius:50%" style="{{ d.style }}"></span>
+    </sc-for>
+  </div>
+  <div style="position:relative;display:grid;grid-template-columns:repeat(3,110px);gap:16px">
+    <sc-for list="{{ pinKeys }}" as="k" hint-placeholder-count="12">
+      <button onClick="{{ k.onTap }}" style="height:88px;border-radius:var(--radius-lg);cursor:pointer;font-family:var(--font-heading);font-weight:500;font-size:30px;background:var(--color-surface);border:1px solid var(--color-divider);color:var(--color-text)" style-active="background:color-mix(in srgb,var(--color-accent) 20%,transparent)">{{ k.label }}</button>
+    </sc-for>
+  </div>
+  <div style="position:relative;min-height:26px;font-size:16px;color:var(--color-accent-300)">{{ pinErr }}</div>
+  <button class="btn btn-secondary" onClick="{{ exitPin }}" style="position:relative;height:52px;padding:0 26px;font-size:17px;border-radius:var(--radius-lg)">Back to music</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isParent }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:25;background:var(--color-bg);display:flex;flex-direction:column">
+  <div style="flex:none;display:flex;align-items:center;gap:var(--space-4);padding:20px 24px;position:relative">
+    <div style="position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(to right,transparent,var(--color-divider) 48px,var(--color-divider) calc(100% - 48px),transparent)"></div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent)">Parent controls</div>
+      <div style="font-family:var(--font-heading);font-weight:500;font-size:26px">Jukebox settings</div>
+    </div>
+    <div style="flex:1"></div>
+    <button class="btn btn-primary" onClick="{{ exitParent }}" style="height:48px;padding:0 20px;font-size:16px;border-radius:var(--radius-lg)">Done — back to kids</button>
+  </div>
+
+  <div style="flex:none;display:flex;gap:8px;padding:16px 24px 12px;flex-wrap:wrap">
+    <sc-for list="{{ parentTabs }}" as="t" hint-placeholder-count="5">
+      <button onClick="{{ t.onTap }}" style="{{ t.style }}">{{ t.label }}</button>
+    </sc-for>
+  </div>
+
+  <div class="jb-scroll" style="flex:1;padding:8px 24px 32px">
+
+    <sc-if value="{{ pSongs }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);margin-bottom:var(--space-6)">
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:10px">Search all of Spotify</div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input class="input" value="{{ searchQ }}" onChange="{{ setSearchQ }}" placeholder="Any song or artist on Spotify — try “bunny”, “robot”, “beach”" style="height:42px;font-size:15px">
+            <button class="btn btn-secondary" onClick="{{ clearSearch }}" style="height:42px">Clear</button>
+          </div>
+          <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:var(--space-4)">
+              <sc-for list="{{ searchResults }}" as="r" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:var(--radius-md);background:color-mix(in srgb,#e9e9ed 4%,transparent)">
+                  <span style="width:36px;height:36px;flex:none;border-radius:var(--radius-sm);overflow:hidden;display:block"><span style="{{ r.artStyle }}"></span></span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:15px;display:flex;align-items:center;gap:8px">
+                      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.title }}</span>
+                      <sc-if value="{{ r.explicit }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Explicit</span></sc-if>
+                    </div>
+                    <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 50%,transparent)">{{ r.artist }} · {{ r.len }}</div>
+                  </div>
+                  <button onClick="{{ r.onAdd }}" style="{{ r.addStyle }}">{{ r.addLabel }}</button>
+                </div>
+              </sc-for>
+              <sc-if value="{{ searchEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:18px;border-radius:var(--radius-md);border:1px dashed var(--color-divider);font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">No matches left to add — everything found is already in the jukebox.</div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:var(--space-2)">
+          <h4 style="margin:0">In the jukebox</h4>
+          <span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 50%,transparent)">{{ libraryCount }}</span>
+        </div>
+        <p style="font-size:14px;color:color-mix(in srgb,var(--color-text) 60%,transparent);max-width:560px">One flat list, however a song got here — searched and added, or pulled in by a linked playlist. Hidden songs stay listed but never reach the kids' browser; Remove takes the song out of the jukebox even if its playlist still has it.</p>
+        <table class="table">
+          <thead><tr><th>Song</th><th>Artist</th><th>Source</th><th style="text-align:right">Kids can play</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ adminSongs }}" as="s" hint-placeholder-count="10">
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="width:34px;height:34px;flex:none;border-radius:var(--radius-sm);overflow:hidden;display:block"><span style="{{ s.artStyle }}"></span></span>
+                    <span>{{ s.title }}</span>
+                    <sc-if value="{{ s.explicit }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Explicit</span></sc-if>
+                  </div>
+                </td>
+                <td class="text-muted">{{ s.artist }}</td>
+                <td class="text-muted" style="font-size:12px">{{ s.source }}</td>
+                <td style="text-align:right">
+                  <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center">
+                    <button onClick="{{ s.onToggle }}" style="{{ s.toggleStyle }}">{{ s.toggleLabel }}</button>
+                    <button class="btn btn-icon btn-secondary" onClick="{{ s.onRemove }}" aria-label="Remove from jukebox"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pPlaylists }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+        <p style="margin:0;font-size:14px;color:color-mix(in srgb,var(--color-text) 60%,transparent);max-width:560px">Linking a Spotify playlist pours its tracks into the jukebox as individual songs — the kids never see the playlist itself. Edit a collaborative playlist in Spotify (or here) and the jukebox follows on the next sync.</p>
+
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:10px">Linked playlists</div>
+          <sc-if value="{{ noneLinked }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:24px;border-radius:var(--radius-md);border:1px dashed var(--color-divider);font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">No playlists linked yet. Link one below to add its songs in bulk.</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <sc-for list="{{ linkedPlaylists }}" as="p" hint-placeholder-count="1">
+              <div style="padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm)">
+                <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+                  <div style="flex:1;min-width:200px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <h4 style="margin:0">{{ p.name }}</h4>
+                      <sc-if value="{{ p.collab }}" hint-placeholder-val="{{ true }}"><span class="tag tag-accent">Collaborative</span></sc-if>
+                    </div>
+                    <div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin-top:3px">{{ p.owner }} · {{ p.countLabel }}</div>
+                    <sc-if value="{{ p.hasBlocked }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12px;color:var(--color-neutral-400);margin-top:3px">{{ p.blockedLabel }}</div>
+                    </sc-if>
+                  </div>
+                  <button class="btn btn-primary" onClick="{{ p.onSync }}">{{ p.syncLabel }}</button>
+                  <button class="btn btn-secondary" onClick="{{ p.onUnlink }}">Unlink</button>
+                </div>
+                <div style="height:1px;margin:var(--space-3) 0;background:var(--color-divider)"></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <sc-for list="{{ p.tracks }}" as="t" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--radius-md);background:color-mix(in srgb,#e9e9ed 4%,transparent)">
+                      <span style="width:30px;height:30px;flex:none;border-radius:var(--radius-sm);overflow:hidden;display:block"><span style="{{ t.artStyle }}"></span></span>
+                      <span style="flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.title }}</span>
+                      <span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 45%,transparent);white-space:nowrap">{{ t.artist }}</span>
+                      <span style="{{ t.stateStyle }}">{{ t.stateLabel }}</span>
+                      <button class="btn btn-icon btn-secondary" onClick="{{ t.onRemove }}" aria-label="Remove from this playlist"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:10px">Your Spotify playlists</div>
+          <sc-if value="{{ noneAvailable }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:24px;border-radius:var(--radius-md);border:1px dashed var(--color-divider);font-size:14px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Every playlist on this account is already linked.</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ availablePlaylists }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-md);background:color-mix(in srgb,#e9e9ed 4%,transparent)">
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:15px">
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</span>
+                    <sc-if value="{{ p.collab }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Collaborative</span></sc-if>
+                  </div>
+                  <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 50%,transparent)">{{ p.owner }} · {{ p.count }}</div>
+                </div>
+                <button class="btn btn-primary" onClick="{{ p.onLink }}">Link</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pQueue }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:14px;color:color-mix(in srgb,var(--color-text) 60%,transparent)">{{ queueSummary }}</span>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary" onClick="{{ shuffleQueue }}">Shuffle</button>
+          <button class="btn btn-secondary" onClick="{{ clearQueue }}">Clear all</button>
+        </div>
+        <div style="padding:var(--space-3) var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:14px">
+          <span style="width:44px;height:44px;flex:none;border-radius:var(--radius-md);overflow:hidden;display:block"><span style="{{ npArtStyle }}"></span></span>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:var(--font-heading);font-size:17px">{{ npTitle }}</div>
+            <div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Now playing · {{ npArtist }}</div>
+          </div>
+          <button class="btn btn-secondary" onClick="{{ skip }}">Skip</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ queueRows }}" as="q" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-md);background:color-mix(in srgb,var(--color-text) 4%,transparent)">
+              <span style="width:24px;font-size:13px;color:color-mix(in srgb,var(--color-text) 45%,transparent);font-variant-numeric:tabular-nums">{{ q.n }}</span>
+              <span style="width:36px;height:36px;flex:none;border-radius:var(--radius-sm);overflow:hidden;display:block"><span style="{{ q.artStyle }}"></span></span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ q.title }}</div>
+                <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 50%,transparent)">{{ q.artist }} · added by {{ q.by }}</div>
+              </div>
+              <button class="btn btn-icon btn-secondary" onClick="{{ q.up }}" aria-label="Move up"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l6-6 6 6"/></svg></button>
+              <button class="btn btn-icon btn-secondary" onClick="{{ q.down }}" aria-label="Move down"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10l6 6 6-6"/></svg></button>
+              <button class="btn btn-icon btn-secondary" onClick="{{ q.remove }}" aria-label="Remove"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:36px;border-radius:var(--radius-lg);border:1px dashed var(--color-divider);text-align:center;font-size:15px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">Nothing queued. Songs the kids tap while music is playing land here.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pSpotify }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4);max-width:560px">
+        <div style="padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:var(--space-3)">
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="width:48px;height:48px;border-radius:50%;background:var(--color-accent-800);display:grid;place-items:center;color:var(--color-accent-200);font-family:var(--font-heading);font-size:18px">{{ acctInitial }}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:var(--font-heading);font-size:18px">{{ acctName }}</div>
+              <div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">{{ acctEmail }}</div>
+            </div>
+            <span class="tag tag-accent">{{ acctStatus }}</span>
+          </div>
+          <div style="height:1px;background:var(--color-divider)"></div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+            <div style="display:flex;justify-content:space-between"><span class="text-muted">Plan</span><span>{{ acctPlan }}</span></div>
+            <div style="display:flex;justify-content:space-between"><span class="text-muted">Playback device</span><span>{{ device }}</span></div>
+            <div style="display:flex;justify-content:space-between"><span class="text-muted">Explicit filter</span><span>On — enforced for kids</span></div>
+            <div style="display:flex;justify-content:space-between"><span class="text-muted">Last synced</span><span>{{ acctSync }}</span></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" onClick="{{ resync }}">Re-sync library</button>
+            <button class="btn btn-secondary" onClick="{{ toggleConnect }}">{{ connectLabel }}</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 55%,transparent);margin-bottom:10px">Play on</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ devices }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.onTap }}" style="{{ d.style }}">{{ d.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pPin }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4);max-width:380px">
+        <p style="font-size:14px;color:color-mix(in srgb,var(--color-text) 60%,transparent)">Four digits. This is the code for the hidden corner — press and hold the top-right corner of the kids' screen for a second and a half.</p>
+        <div class="field"><label>Current PIN</label><input class="input" type="password" inputMode="numeric" maxLength="4" value="{{ pinCur }}" onChange="{{ setPinCur }}"></div>
+        <div class="field"><label>New PIN</label><input class="input" type="password" inputMode="numeric" maxLength="4" value="{{ pinNew }}" onChange="{{ setPinNew }}"></div>
+        <div class="field"><label>Confirm new PIN</label><input class="input" type="password" inputMode="numeric" maxLength="4" value="{{ pinConf }}" onChange="{{ setPinConf }}"></div>
+        <div style="{{ pinMsgStyle }}">{{ pinMsg }}</div>
+        <button class="btn btn-primary btn-block" onClick="{{ savePin }}" style="height:46px">Save new PIN</button>
+      </div>
+    </sc-if>
+
+  </div>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);padding:12px 22px;border-radius:44px;background:var(--color-surface);box-shadow:var(--shadow-lg);font-family:var(--font-heading);font-size:16px;animation:riseIn .22s ease-out;white-space:nowrap">{{ toast }}</div>
+  </sc-if>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:800,&quot;height&quot;:1280},&quot;columns&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:3,&quot;min&quot;:2,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Kid screen&quot;},&quot;accentGlow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Kid screen&quot;}}">
+const ART = [
+  { a: '#4c5397', b: '#262a60' },
+  { a: '#5d5294', b: '#2b2741' },
+  { a: '#595d6c', b: '#292b31' },
+  { a: '#796cbf', b: '#2b2741' },
+  { a: '#353b80', b: '#232532' },
+  { a: '#75798c', b: '#3f424d' }
+];
+const SONGS = [
+  ['s1', 'Bouncing Boots', 'The Sunny Socks', 168],
+  ['s2', 'Puddle Parade', 'The Sunny Socks', 145],
+  ['s3', 'Sunhat Shuffle', 'The Sunny Socks', 191],
+  ['s4', 'Marble Run', 'Marbles & Mo', 132],
+  ['s5', 'Two Left Feet', 'Marbles & Mo', 160],
+  ['s6', 'Cardboard Rocket', 'Marbles & Mo', 175],
+  ['s7', 'Coconut Radio', 'Captain Ukulele', 154],
+  ['s8', 'Sail the Bathtub', 'Captain Ukulele', 143],
+  ['s9', 'Seven Little Fish', 'Captain Ukulele', 128],
+  ['s10', 'Trolley Song', 'Twinkle Tram', 137],
+  ['s11', 'Green Light Go', 'Twinkle Tram', 149],
+  ['s12', 'Sleepy Station', 'Twinkle Tram', 205],
+  ['s13', 'Carrot Cha-Cha', 'Bongo Bunnies', 141],
+  ['s14', 'Thump Thump Thump', 'Bongo Bunnies', 122],
+  ['s15', 'Hop Til Sundown', 'Bongo Bunnies', 158],
+  ['s16', 'Paper Lantern', 'Luna & the Lanterns', 183],
+  ['s17', 'Counting Stars Down', 'Luna & the Lanterns', 199],
+  ['s18', 'Moon Milk', 'Luna & the Lanterns', 214],
+  ['s19', 'Late Night Drive', 'Vellum Hours', 226, true],
+  ['s20', 'Static Bloom', 'Vellum Hours', 241, true],
+  ['s21', 'Windy Kite', 'The Sunny Socks', 152],
+  ['s22', 'Robot Pancakes', 'Marbles & Mo', 138],
+  ['s23', 'Anchors Away', 'Captain Ukulele', 147],
+  ['s24', 'Night Bus', 'Twinkle Tram', 168],
+  ['s25', 'Bunny Boogie', 'Bongo Bunnies', 130],
+  ['s26', 'Firefly Field', 'Luna & the Lanterns', 191],
+  ['s27', 'Thunder Room', 'Vellum Hours', 208, true],
+  ['s28', 'Dinosaur Stomp', 'The Sunny Socks', 144],
+  ['s29', 'Bubblegum Bridge', 'Marbles & Mo', 129],
+  ['s30', 'Lighthouse Lullaby', 'Captain Ukulele', 197],
+  ['s31', 'Tickle Monster', 'Bongo Bunnies', 118],
+  ['s32', 'Snow Day', 'Twinkle Tram', 163],
+  ['s33', 'Comet Tail', 'Luna & the Lanterns', 176],
+  ['s34', 'Pancake Sunday', 'Marbles & Mo', 151],
+  ['s35', 'Barefoot Beach', 'Captain Ukulele', 158]
+];
+const IN_LIB = 18;
+const SP_PLAYLISTS = [
+  { id: 'pl1', name: 'Kids Car Mix', owner: 'You', collab: false, songs: ['s21', 's22', 's6', 's10'], upstream: ['s33'] },
+  { id: 'pl2', name: 'Cousins Collab', owner: 'Shared with Grandma, Aunt Bea', collab: true, songs: ['s25', 's23', 's13'], upstream: ['s24', 's31'] },
+  { id: 'pl3', name: 'Bedtime Wind Down', owner: 'You', collab: false, songs: ['s16', 's18', 's12', 's30'], upstream: [] },
+  { id: 'pl4', name: 'Uncle Ray’s Bangers', owner: 'Shared with Uncle Ray', collab: true, songs: ['s27', 's14', 's2'], upstream: [] }
+];
+
+class Component extends DCLogic {
+  state = {
+    view: 'kid', tab: 'recent', artist: null, favKid: 'k1',
+    playingId: 's7', playing: true, pos: 42,
+    queue: [{ id: 's4', by: 'Leo' }, { id: 's13', by: 'Ava' }],
+    favorites: { k1: ['s1', 's5'], k2: ['s3'], k3: [], k4: ['s7', 's2'] },
+    hidden: { s12: true },
+    pin: '1234', pinEntry: '', pinErr: '', pressing: false,
+    showFav: false, toast: '',
+    parentTab: 'songs', searchQ: '', added: {}, removed: {}, skipHold: 0,
+    connected: true, device: 'Kitchen Tablet',
+    playlists: SP_PLAYLISTS.map(p => Object.assign({}, p, { songs: p.songs.slice(), upstream: p.upstream.slice() })),
+    linked: ['pl2'],
+    pinCur: '', pinNew: '', pinConf: '', pinMsg: '', pinOk: false,
+    recent: ['s7', 's1', 's13', 's16', 's4', 's10', 's9', 's5', 's18']
+  };
+  kids = [
+    { id: 'k1', name: 'Mia' }, { id: 'k2', name: 'Leo' },
+    { id: 'k3', name: 'Ava' }, { id: 'k4', name: 'Sam' }
+  ];
+  songs = SONGS.map((s, i) => ({ id: s[0], title: s[1], artist: s[2], secs: s[3], explicit: !!s[4], art: i % 6, seed: i < IN_LIB }));
+
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      if (!this.state.playing) return;
+      const s = this.song(this.state.playingId);
+      if (s && this.state.pos >= s.secs) this.advance();
+      else this.setState(st => ({ pos: st.pos + 1 }));
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearInterval(this.skipTimer); clearTimeout(this.pressTimer); clearTimeout(this.toastTimer); }
+
+  song(id) { return this.songs.find(s => s.id === id); }
+  fmt(n) { const m = Math.floor(n / 60); const s = Math.floor(n % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
+  artBg(i) {
+    const c = ART[i % 6];
+    return 'radial-gradient(120% 120% at 28% 18%, ' + c.a + ', ' + c.b + ' 72%)';
+  }
+  artStyle(i) { return { width: '100%', height: '100%', display: 'block', background: this.artBg(i) }; }
+  artFill(i) { return { position: 'absolute', inset: 0, background: this.artBg(i) }; }
+  flash(msg) {
+    clearTimeout(this.toastTimer);
+    this.setState({ toast: msg });
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2200);
+  }
+  inLibrary(s) {
+    if (this.state.removed[s.id]) return false;
+    if (s.seed || this.state.added[s.id]) return true;
+    return this.state.linked.some(pid => {
+      const p = this.state.playlists.find(x => x.id === pid);
+      return p && p.songs.indexOf(s.id) > -1;
+    });
+  }
+  fromPlaylists(id) {
+    return this.state.linked
+      .map(pid => this.state.playlists.find(x => x.id === pid))
+      .filter(p => p && p.songs.indexOf(id) > -1)
+      .map(p => p.name);
+  }
+  linkPlaylist(p) {
+    const n = p.songs.filter(id => !this.song(id).explicit).length;
+    this.setState(x => ({ linked: x.linked.concat([p.id]) }));
+    this.flash(p.name + ' linked — ' + n + ' songs added');
+  }
+  unlinkPlaylist(p) {
+    this.setState(x => ({ linked: x.linked.filter(id => id !== p.id) }));
+    this.flash(p.name + ' unlinked');
+  }
+  syncPlaylist(p) {
+    if (!p.upstream.length) return this.flash(p.name + ' is up to date');
+    const incoming = p.upstream.slice();
+    this.setState(x => ({
+      playlists: x.playlists.map(q => q.id === p.id ? Object.assign({}, q, { songs: q.songs.concat(incoming), upstream: [] }) : q)
+    }));
+    this.flash(incoming.length + ' new song' + (incoming.length > 1 ? 's' : '') + ' pulled from ' + p.name);
+  }
+  removeFromPlaylist(p, id) {
+    this.setState(x => ({
+      playlists: x.playlists.map(q => q.id === p.id ? Object.assign({}, q, { songs: q.songs.filter(s => s !== id) }) : q)
+    }));
+    this.flash(this.song(id).title + ' removed from ' + p.name);
+  }
+  addToPlaylist(pid, id) {
+    this.setState(x => ({
+      playlists: x.playlists.map(q => q.id === pid && q.songs.indexOf(id) < 0 ? Object.assign({}, q, { songs: q.songs.concat([id]) }) : q)
+    }));
+    this.flash(this.song(id).title + ' added to the playlist');
+  }
+  skipDown = () => {
+    this.skipStart = Date.now();
+    clearInterval(this.skipTimer);
+    this.setState({ skipHold: 0.02 });
+    this.skipTimer = setInterval(() => {
+      const p = Math.min(1, (Date.now() - this.skipStart) / 1000);
+      if (p >= 1) {
+        clearInterval(this.skipTimer);
+        this.setState({ skipHold: 0 });
+        this.advance();
+      } else this.setState({ skipHold: p });
+    }, 40);
+  };
+  skipUp = () => { clearInterval(this.skipTimer); this.setState({ skipHold: 0 }); };
+  library() { return this.songs.filter(s => this.inLibrary(s)); }
+  playable() { return this.library().filter(s => !s.explicit && !this.state.hidden[s.id]); }
+  advance() {
+    const q = this.state.queue.slice();
+    if (q.length) { const n = q.shift(); this.setState({ queue: q, playingId: n.id, pos: 0, playing: true }); }
+    else {
+      const list = this.playable();
+      const i = list.findIndex(s => s.id === this.state.playingId);
+      const nxt = list[(i + 1) % list.length];
+      this.setState({ playingId: nxt.id, pos: 0 });
+    }
+  }
+  tapSong(id) {
+    const s = this.song(id);
+    if (!this.state.playing) { this.setState({ playingId: id, pos: 0, playing: true }); this.flash('Playing ' + s.title); }
+    else { this.setState(st => ({ queue: st.queue.concat([{ id, by: 'Kids' }]) })); this.flash(s.title + ' added to the queue'); }
+  }
+  toggleFav(kidId) {
+    const id = this.state.playingId;
+    const kid = this.kids.find(k => k.id === kidId);
+    const cur = this.state.favorites[kidId] || [];
+    const has = cur.indexOf(id) > -1;
+    const next = has ? cur.filter(x => x !== id) : cur.concat([id]);
+    this.setState(st => ({ favorites: Object.assign({}, st.favorites, { [kidId]: next }), showFav: false }));
+    this.flash(has ? 'Removed from ' + kid.name + "'s favorites" : 'Saved to ' + kid.name + "'s favorites");
+  }
+  secretDown = () => {
+    this.setState({ pressing: true });
+    this.pressTimer = setTimeout(() => this.setState({ view: 'pin', pressing: false, pinEntry: '', pinErr: '' }), 1500);
+  };
+  secretUp = () => { clearTimeout(this.pressTimer); this.setState({ pressing: false }); };
+  pinPress(k) {
+    if (k === 'del') return this.setState(st => ({ pinEntry: st.pinEntry.slice(0, -1), pinErr: '' }));
+    if (k === 'x') return this.setState({ view: 'kid', pinEntry: '' });
+    const e = this.state.pinEntry + k;
+    if (e.length < 4) return this.setState({ pinEntry: e, pinErr: '' });
+    if (e === this.state.pin) this.setState({ view: 'parent', pinEntry: '', pinErr: '', parentTab: 'songs' });
+    else this.setState({ pinEntry: '', pinErr: 'That PIN did not match. Try again.' });
+  }
+  moveQ(i, d) {
+    const q = this.state.queue.slice();
+    const j = i + d;
+    if (j < 0 || j >= q.length) return;
+    const t = q[i]; q[i] = q[j]; q[j] = t;
+    this.setState({ queue: q });
+  }
+  savePin = () => {
+    const { pinCur, pinNew, pinConf, pin } = this.state;
+    if (pinCur !== pin) return this.setState({ pinMsg: 'Current PIN is incorrect.', pinOk: false });
+    if (!/^\d{4}$/.test(pinNew)) return this.setState({ pinMsg: 'New PIN must be exactly four digits.', pinOk: false });
+    if (pinNew !== pinConf) return this.setState({ pinMsg: 'The two new PINs do not match.', pinOk: false });
+    this.setState({ pin: pinNew, pinCur: '', pinNew: '', pinConf: '', pinMsg: 'PIN updated.', pinOk: true });
+  };
+
+  bigTab(on) {
+    return Object.assign({
+      flex: 1, height: '70px', borderRadius: 'var(--radius-lg)', cursor: 'pointer',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: '2px', fontFamily: 'var(--font-heading)', fontWeight: 500, fontSize: '20px'
+    }, this.tabStyle(on));
+  }
+  smallTab(on) {
+    return Object.assign({
+      padding: '11px 18px', borderRadius: 'var(--radius-md)', cursor: 'pointer',
+      fontFamily: 'var(--font-heading)', fontWeight: 500, fontSize: '16px'
+    }, this.tabStyle(on));
+  }
+  tabStyle(on) {
+    return on
+      ? { background: 'color-mix(in srgb, var(--color-accent) 16%, transparent)', border: '1px solid var(--color-accent)', color: 'var(--color-accent-200)' }
+      : { background: 'var(--color-surface)', border: '1px solid var(--color-divider)', color: 'color-mix(in srgb, var(--color-text) 72%, transparent)' };
+  }
+  chipStyle(on) {
+    return on
+      ? { background: 'color-mix(in srgb, var(--color-accent) 18%, transparent)', border: '1px solid var(--color-accent)', color: 'var(--color-accent-200)' }
+      : { background: 'transparent', border: '1px solid var(--color-divider)', color: 'var(--color-text)' };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const cols = this.props.columns ?? 3;
+    const glowOn = this.props.accentGlow ?? true;
+    const np = this.song(st.playingId) || this.songs[0];
+    const pct = Math.min(100, (st.pos / np.secs) * 100);
+    const favKids = this.kids.filter(k => (st.favorites[k.id] || []).indexOf(np.id) > -1);
+    const artistNames = this.songs.filter(s => !s.explicit).map(s => s.artist).filter((a, i, arr) => arr.indexOf(a) === i);
+
+    let tiles = [], heading = '', empty = '';
+    const mk = s => ({
+      id: s.id, title: s.title, sub2: s.artist, sub: '', isArtist: false,
+      artStyle: this.artFill(s.art), starred: this.kids.some(k => (st.favorites[k.id] || []).indexOf(s.id) > -1),
+      onTap: () => this.tapSong(s.id)
+    });
+    if (st.tab === 'recent') {
+      heading = 'Played lately';
+      tiles = st.recent.map(id => this.song(id)).filter(s => s && !st.hidden[s.id]).map(mk);
+    } else if (st.tab === 'songs') {
+      heading = 'All songs';
+      tiles = this.playable().slice().sort((a, b) => a.title.localeCompare(b.title)).map(mk);
+    } else if (st.tab === 'artists') {
+      if (st.artist) {
+        heading = st.artist;
+        tiles = this.playable().filter(s => s.artist === st.artist).map(mk);
+      } else {
+        heading = 'Artists';
+        tiles = artistNames.map((a, i) => {
+          const n = this.playable().filter(s => s.artist === a).length;
+          return { id: a, title: a, sub2: n + ' songs', sub: n + ' songs', isArtist: true, artStyle: this.artFill(i), starred: false, onTap: () => this.setState({ artist: a }) };
+        });
+      }
+    } else {
+      const kid = this.kids.find(k => k.id === st.favKid);
+      heading = kid.name + "'s favorites";
+      empty = 'No favorites yet. Tap the star while a song plays.';
+      tiles = (st.favorites[st.favKid] || []).map(id => this.song(id)).filter(s => s && !st.hidden[s.id]).map(mk);
+    }
+
+    return {
+      isKid: st.view === 'kid', isPin: st.view === 'pin', isParent: st.view === 'parent',
+      glowOn, playing: st.playing, paused: !st.playing,
+      npTitle: np.title, npArtist: np.artist, npPos: this.fmt(st.pos), npLen: this.fmt(np.secs),
+      npKicker: st.playing ? 'Now playing' : 'Paused',
+      npArtStyle: { width: '100%', height: '100%', display: 'grid', placeItems: 'center', background: this.artBg(np.art) },
+      npBarStyle: { height: '100%', borderRadius: '6px', background: 'var(--color-accent)', width: pct + '%', transition: 'width .9s linear' },
+      npStarFill: favKids.length ? '#b5abfc' : 'none',
+      npFavLabel: favKids.length ? favKids.map(k => k.name).join(', ') : 'Favorite',
+      togglePlay: () => this.setState(s => ({ playing: !s.playing })),
+      skip: () => this.advance(),
+      skipDown: this.skipDown, skipUp: this.skipUp,
+      skipHolding: st.skipHold > 0,
+      skipRingOffset: 257.6 - 257.6 * st.skipHold,
+      skipRingStroke: st.skipHold > 0 ? 'var(--color-accent)' : 'transparent',
+      openFav: () => this.setState({ showFav: true }),
+      closeFav: () => this.setState({ showFav: false }),
+      showFav: st.showFav,
+      favRows: this.kids.map(k => {
+        const on = (st.favorites[k.id] || []).indexOf(np.id) > -1;
+        return {
+          name: k.name, initial: k.name[0], hint: on ? 'Tap to remove' : 'Tap to add',
+          starFill: on ? '#b5abfc' : 'none', starStroke: on ? '#b5abfc' : 'color-mix(in srgb, #e9e9ed 40%, transparent)',
+          style: {
+            display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px',
+            borderRadius: 'var(--radius-lg)', cursor: 'pointer', textAlign: 'left',
+            color: 'var(--color-text)',
+            background: on ? 'color-mix(in srgb, var(--color-accent) 16%, transparent)' : 'color-mix(in srgb, #e9e9ed 5%, transparent)',
+            border: '1px solid ' + (on ? 'var(--color-accent)' : 'var(--color-divider)')
+          },
+          avatarStyle: {
+            width: '52px', height: '52px', flex: 'none', borderRadius: '50%', display: 'grid',
+            placeItems: 'center', fontFamily: 'var(--font-heading)', fontWeight: 500, fontSize: '22px',
+            background: on ? 'var(--color-accent-700)' : 'var(--color-neutral-800)',
+            color: on ? 'var(--color-accent-100)' : 'var(--color-neutral-200)'
+          },
+          onTap: () => this.toggleFav(k.id)
+        };
+      }),
+      tabs: [
+        { key: 'recent', label: 'Recent' }, { key: 'songs', label: 'Songs' },
+        { key: 'artists', label: 'Artists' }, { key: 'favorites', label: 'Favorites' }
+      ].map(t => ({ label: t.label, style: this.bigTab(st.tab === t.key), onTap: () => this.setState({ tab: t.key, artist: null }) })),
+      showArtistBack: st.tab === 'artists' && !!st.artist,
+      clearArtist: () => this.setState({ artist: null }),
+      showKidPicker: st.tab === 'favorites',
+      kidChips: this.kids.map(k => ({
+        name: k.name,
+        style: Object.assign({ flex: 1, height: '60px', borderRadius: 'var(--radius-lg)', cursor: 'pointer', fontFamily: 'var(--font-heading)', fontWeight: 500, fontSize: '20px' }, this.chipStyle(st.favKid === k.id)),
+        onTap: () => this.setState({ favKid: k.id })
+      })),
+      gridHeading: heading, gridCount: tiles.length + (st.tab === 'artists' && !st.artist ? ' artists' : ' songs'),
+      gridEmpty: tiles.length === 0, emptyText: empty || 'Nothing here yet.',
+      gridStyle: { display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(' + cols + ', 1fr)' },
+      tiles,
+      toast: st.toast, pressing: st.pressing,
+      secretDown: this.secretDown, secretUp: this.secretUp,
+
+      pinDots: [0, 1, 2, 3].map(i => ({
+        style: { background: i < st.pinEntry.length ? 'var(--color-accent)' : 'transparent', border: '2px solid ' + (i < st.pinEntry.length ? 'var(--color-accent)' : 'var(--color-neutral-700)') }
+      })),
+      pinKeys: ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'x'].map(k => ({
+        label: k === 'del' ? '⌫' : k === 'x' ? '✕' : k, onTap: () => this.pinPress(k)
+      })),
+      pinErr: st.pinErr, pinHint: 'Hint for the demo: 1234',
+      exitPin: () => this.setState({ view: 'kid', pinEntry: '', pinErr: '' }),
+      exitParent: () => this.setState({ view: 'kid' }),
+
+      parentTabs: [
+        { key: 'songs', label: 'Songs' }, { key: 'playlists', label: 'Playlists' },
+        { key: 'queue', label: 'Queue' }, { key: 'spotify', label: 'Spotify Account' },
+        { key: 'pin', label: 'Change PIN' }
+      ].map(t => ({ label: t.label, style: this.smallTab(st.parentTab === t.key), onTap: () => this.setState({ parentTab: t.key }) })),
+      pSongs: st.parentTab === 'songs', pPlaylists: st.parentTab === 'playlists',
+      pQueue: st.parentTab === 'queue', pSpotify: st.parentTab === 'spotify', pPin: st.parentTab === 'pin',
+
+      searchQ: st.searchQ,
+      setSearchQ: e => this.setState({ searchQ: e.target.value }),
+      clearSearch: () => this.setState({ searchQ: '' }),
+      searchOpen: st.searchQ.trim().length > 0,
+      searchResults: this.songs.filter(s => {
+        if (this.inLibrary(s)) return false;
+        const q = st.searchQ.trim().toLowerCase();
+        return s.title.toLowerCase().indexOf(q) > -1 || s.artist.toLowerCase().indexOf(q) > -1;
+      }).map(s => ({
+        title: s.title, artist: s.artist, len: this.fmt(s.secs), explicit: s.explicit,
+        artStyle: this.artStyle(s.art), canAdd: !s.explicit,
+        addLabel: s.explicit ? 'Blocked — explicit' : 'Add',
+        addStyle: Object.assign({
+          cursor: 'pointer', fontFamily: 'var(--font-heading)', fontSize: '13px',
+          padding: '7px 16px', borderRadius: 'var(--radius-md)'
+        }, s.explicit
+          ? { background: 'var(--color-neutral-800)', border: '1px solid transparent', color: 'var(--color-neutral-300)', cursor: 'not-allowed' }
+          : { background: 'transparent', border: '1px solid var(--color-accent)', color: 'var(--color-accent)' }),
+        onAdd: () => {
+          if (s.explicit) return;
+          this.setState(x => ({ added: Object.assign({}, x.added, { [s.id]: true }), removed: Object.assign({}, x.removed, { [s.id]: false }) }));
+          this.flash(s.title + ' added to the jukebox');
+        }
+      })),
+      searchEmpty: st.searchQ.trim().length > 0 && this.songs.filter(s => {
+        if (this.inLibrary(s)) return false;
+        const q = st.searchQ.trim().toLowerCase();
+        return s.title.toLowerCase().indexOf(q) > -1 || s.artist.toLowerCase().indexOf(q) > -1;
+      }).length === 0,
+      libraryCount: this.library().length + ' songs in the jukebox',
+      adminSongs: this.library().map(s => {
+        const blocked = s.explicit || !!st.hidden[s.id];
+        const via = this.fromPlaylists(s.id);
+        return {
+          title: s.title, artist: s.artist, len: this.fmt(s.secs), explicit: s.explicit,
+          artStyle: this.artStyle(s.art),
+          source: via.length ? via.join(', ') : 'Added directly',
+          toggleLabel: s.explicit ? 'Blocked' : st.hidden[s.id] ? 'Hidden' : 'Allowed',
+          toggleStyle: Object.assign({
+            cursor: 'pointer', fontFamily: 'var(--font-heading)', fontSize: '13px',
+            padding: '6px 14px', borderRadius: 'var(--radius-md)'
+          }, s.explicit
+            ? { background: 'var(--color-neutral-800)', border: '1px solid transparent', color: 'var(--color-neutral-300)', cursor: 'not-allowed' }
+            : blocked
+              ? { background: 'transparent', border: '1px solid var(--color-divider)', color: 'color-mix(in srgb, var(--color-text) 55%, transparent)' }
+              : { background: 'color-mix(in srgb, var(--color-accent) 14%, transparent)', border: '1px solid var(--color-accent)', color: 'var(--color-accent-200)' }),
+          onToggle: () => { if (s.explicit) return; this.setState(x => ({ hidden: Object.assign({}, x.hidden, { [s.id]: !x.hidden[s.id] }) })); },
+          onRemove: () => {
+            this.setState(x => ({
+              removed: Object.assign({}, x.removed, { [s.id]: true }),
+              queue: x.queue.filter(q => q.id !== s.id)
+            }));
+            if (this.state.playingId === s.id) this.advance();
+            this.flash(s.title + ' removed');
+          }
+        };
+      }),
+
+      linkedPlaylists: st.linked.map(pid => st.playlists.find(p => p.id === pid)).filter(Boolean).map(p => {
+        const live = p.songs.filter(id => !this.song(id).explicit && !st.removed[id]);
+        const blockedN = p.songs.filter(id => this.song(id).explicit).length;
+        return {
+          name: p.name, owner: p.owner, collab: p.collab,
+          countLabel: live.length + ' songs in the jukebox',
+          blockedLabel: blockedN ? blockedN + ' explicit track hidden' : '',
+          hasBlocked: blockedN > 0,
+          pending: p.upstream.length > 0,
+          syncLabel: p.upstream.length ? 'Sync — ' + p.upstream.length + ' new' : 'Synced',
+          onSync: () => this.syncPlaylist(p),
+          onUnlink: () => this.unlinkPlaylist(p),
+          tracks: p.songs.map(id => {
+            const s = this.song(id);
+            return {
+              title: s.title, artist: s.artist, explicit: s.explicit, artStyle: this.artStyle(s.art),
+              stateLabel: s.explicit ? 'Blocked' : st.removed[id] ? 'Removed by you' : 'In jukebox',
+              stateStyle: {
+                fontSize: '11px', padding: '3px 9px', borderRadius: '6px', whiteSpace: 'nowrap',
+                background: s.explicit || st.removed[id] ? 'var(--color-neutral-800)' : 'var(--color-accent-800)',
+                color: s.explicit || st.removed[id] ? 'var(--color-neutral-300)' : 'var(--color-accent-100)'
+              },
+              onRemove: () => this.removeFromPlaylist(p, id)
+            };
+          })
+        };
+      }),
+      availablePlaylists: st.playlists.filter(p => st.linked.indexOf(p.id) < 0).map(p => ({
+        name: p.name, owner: p.owner, collab: p.collab,
+        count: p.songs.length + ' tracks',
+        onLink: () => this.linkPlaylist(p)
+      })),
+      noneAvailable: st.playlists.filter(p => st.linked.indexOf(p.id) < 0).length === 0,
+      noneLinked: st.linked.length === 0,
+
+      queueRows: st.queue.map((q, i) => {
+        const s = this.song(q.id);
+        return {
+          n: i + 1, title: s.title, artist: s.artist, by: q.by, artStyle: this.artStyle(s.art),
+          up: () => this.moveQ(i, -1), down: () => this.moveQ(i, 1),
+          remove: () => this.setState(x => ({ queue: x.queue.filter((_, j) => j !== i) }))
+        };
+      }),
+      queueEmpty: st.queue.length === 0,
+      queueSummary: st.queue.length + ' up next · ' + this.fmt(st.queue.reduce((t, q) => t + this.song(q.id).secs, 0)) + ' total',
+      clearQueue: () => this.setState({ queue: [] }),
+      shuffleQueue: () => this.setState(x => ({ queue: x.queue.slice().sort(() => Math.random() - 0.5) })),
+
+      acctName: 'Dana Whitfield', acctEmail: 'dana.whitfield@gmail.com', acctInitial: 'D',
+      acctStatus: st.connected ? 'Connected' : 'Disconnected',
+      acctPlan: st.connected ? 'Spotify Premium · Family' : 'Not connected',
+      acctSync: 'Today, 7:42 AM', device: st.device,
+      connectLabel: st.connected ? 'Disconnect account' : 'Connect Spotify',
+      toggleConnect: () => this.setState(x => ({ connected: !x.connected })),
+      resync: () => this.flash('Library re-synced'),
+      devices: ['Kitchen Tablet', 'Living Room Speaker', 'Playroom Echo'].map(d => ({
+        name: d,
+        style: Object.assign({ padding: '11px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '15px', fontFamily: 'var(--font-heading)' }, this.chipStyle(st.device === d)),
+        onTap: () => this.setState({ device: d })
+      })),
+
+      pinCur: st.pinCur, pinNew: st.pinNew, pinConf: st.pinConf, pinMsg: st.pinMsg,
+      pinMsgStyle: { minHeight: '20px', fontSize: '14px', color: st.pinOk ? 'var(--color-accent-300)' : 'var(--color-neutral-400)' },
+      setPinCur: e => this.setState({ pinCur: e.target.value, pinMsg: '' }),
+      setPinNew: e => this.setState({ pinNew: e.target.value, pinMsg: '' }),
+      setPinConf: e => this.setState({ pinConf: e.target.value, pinMsg: '' }),
+      savePin: this.savePin
+    };
+  }
+}
+</script>
+</body>
+</html>

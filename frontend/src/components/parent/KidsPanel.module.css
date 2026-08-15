@@ -1,0 +1,92 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 480px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  max-width: 560px;
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.empty {
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-divider);
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #e9e9ed 4%, transparent);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 15px;
+  background: var(--color-neutral-800);
+  color: var(--color-neutral-200);
+}
+
+.name {
+  flex: 1;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.editRow {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.card {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.addRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

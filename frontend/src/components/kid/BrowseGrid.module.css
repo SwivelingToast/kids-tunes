@@ -1,0 +1,147 @@
+.scroll {
+  flex: 1;
+  padding: 8px 28px 34px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid var(--color-divider);
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 19px;
+}
+
+.chipRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.chip {
+  flex: 1;
+  height: 60px;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.chipSelected {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent-200);
+}
+
+.chipUnselected {
+  background: transparent;
+  border: 1px solid var(--color-divider);
+  color: var(--color-text);
+}
+
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.headingTitle {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 22px;
+}
+
+.headingCount {
+  font-size: 15px;
+  color: color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+
+.empty {
+  padding: 52px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-divider);
+  text-align: center;
+  font-size: 19px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.tile {
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--color-text);
+  transition: transform 0.12s ease;
+}
+.tile:active {
+  transform: scale(0.96);
+}
+
+.tileArt {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  place-items: center;
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+  display: grid;
+  place-items: center;
+}
+
+.artistCaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 10px;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-200);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+}
+
+.tileTitle {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 1.15;
+  text-wrap: pretty;
+}
+
+.tileSub {
+  font-size: 16px;
+  color: color-mix(in srgb, var(--color-text) 52%, transparent);
+  line-height: 1.2;
+}

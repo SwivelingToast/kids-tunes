@@ -1,0 +1,26 @@
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  padding: 16px 28px;
+  border-radius: 44px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  animation: riseIn 0.22s ease-out;
+  white-space: nowrap;
+  z-index: 30;
+}
+
+@keyframes riseIn {
+  from {
+    transform: translate(-50%, 18px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}

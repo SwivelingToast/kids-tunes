@@ -1,0 +1,160 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.empty {
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-divider);
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.linkedList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeaderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaLine {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  margin-top: 3px;
+}
+
+.blockedLine {
+  font-size: 12px;
+  color: var(--color-neutral-400);
+  margin-top: 3px;
+}
+
+.divider {
+  height: 1px;
+  margin: var(--space-3) 0;
+  background: var(--color-divider);
+}
+
+.trackList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #e9e9ed 4%, transparent);
+}
+
+.trackThumb {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.trackTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackArtist {
+  flex: none;
+  max-width: 200px;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--color-text) 45%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.chipInJukebox {
+  background: var(--color-accent-800);
+  color: var(--color-accent-100);
+}
+.chipMuted {
+  background: var(--color-neutral-800);
+  color: var(--color-neutral-300);
+}
+
+.availableList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.availableRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #e9e9ed 4%, transparent);
+}
+
+.availableInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.availableNameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.availableName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.availableMeta {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}

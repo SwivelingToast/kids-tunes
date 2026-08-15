@@ -1,0 +1,174 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchCard {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-6);
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.searchRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchInput {
+  height: 42px;
+  font-size: 15px;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: var(--space-4);
+}
+
+.resultRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, #e9e9ed 4%, transparent);
+}
+
+.thumb {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.thumbSmall {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.resultInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.resultTitleRow {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resultTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resultMeta {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+
+.addBtn,
+.addBtnBlocked {
+  flex: none;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: var(--radius-md);
+}
+.addBtn {
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.addBtnBlocked {
+  background: var(--color-neutral-800);
+  border: 1px solid transparent;
+  color: var(--color-neutral-300);
+  cursor: not-allowed;
+}
+
+.emptyDashed {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-divider);
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.libraryHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: var(--space-2);
+}
+
+.libraryHeading {
+  margin: 0;
+}
+
+.libraryCount {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+
+.libraryIntro {
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  max-width: 560px;
+}
+
+.songCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.actionsCell {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.toggleBtn {
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+}
+.toggleAllowed {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent-200);
+}
+.toggleHidden {
+  background: transparent;
+  border: 1px solid var(--color-divider);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+.toggleBlocked {
+  background: var(--color-neutral-800);
+  border: 1px solid transparent;
+  color: var(--color-neutral-300);
+  cursor: not-allowed;
+}

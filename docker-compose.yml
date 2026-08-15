@@ -1,0 +1,19 @@
+services:
+  jukebox:
+    build: .
+    ports:
+      - '3001:3001'
+    volumes:
+      - jukebox-data:/app/backend/data
+    env_file:
+      # Reuses the same file as local dev for the Spotify credentials -
+      # FRONTEND_URL/DB_PATH below deliberately override that file's
+      # dev-oriented values for the containerized, single-origin setup.
+      - ./backend/.env
+    environment:
+      - FRONTEND_URL=http://127.0.0.1:3001
+      - DB_PATH=/app/backend/data/jukebox.db
+    restart: unless-stopped
+
+volumes:
+  jukebox-data:

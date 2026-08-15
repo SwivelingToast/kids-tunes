@@ -1,0 +1,114 @@
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  background: color-mix(in srgb, #0e0f18 72%, transparent);
+}
+
+.card {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.18s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 6px;
+}
+
+.songTitle {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.subLine {
+  font-size: 18px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  margin-top: 4px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  text-align: left;
+  color: var(--color-text);
+}
+
+.rowOn {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border: 1px solid var(--color-accent);
+}
+
+.rowOff {
+  background: color-mix(in srgb, #e9e9ed 5%, transparent);
+  border: 1px solid var(--color-divider);
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 22px;
+}
+
+.avatarOn {
+  background: var(--color-accent-700);
+  color: var(--color-accent-100);
+}
+
+.avatarOff {
+  background: var(--color-neutral-800);
+  color: var(--color-neutral-200);
+}
+
+.name {
+  flex: 1;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 25px;
+}
+
+.hint {
+  font-size: 16px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}

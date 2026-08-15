@@ -1,0 +1,329 @@
+.bar {
+  position: relative;
+  flex: none;
+  padding: 26px 28px 22px;
+  background: var(--color-surface);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+}
+
+.divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px),
+    transparent
+  );
+}
+
+.glow {
+  position: absolute;
+  left: -60px;
+  top: -120px;
+  width: 420px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #5d5294, transparent 68%);
+  filter: blur(30px);
+  animation: glow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.row1 {
+  position: relative;
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+
+.art {
+  width: 158px;
+  height: 158px;
+  flex: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.artIdle {
+  width: 158px;
+  height: 158px;
+  flex: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--color-neutral-900);
+  border: 1px dashed var(--color-divider);
+  text-align: center;
+  padding: 0 14px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 17px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.textCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kickerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 24px;
+}
+
+.eqBar {
+  width: 3px;
+  background: var(--color-accent-400);
+  border-radius: 2px;
+}
+
+.eqBar1 {
+  animation: bar1 0.9s ease-in-out infinite;
+}
+.eqBar2 {
+  animation: bar2 0.9s ease-in-out infinite;
+}
+.eqBar3 {
+  animation: bar3 0.9s ease-in-out infinite;
+}
+
+@keyframes bar1 {
+  0%,
+  100% {
+    height: 8px;
+  }
+  50% {
+    height: 22px;
+  }
+}
+@keyframes bar2 {
+  0%,
+  100% {
+    height: 20px;
+  }
+  50% {
+    height: 9px;
+  }
+}
+@keyframes bar3 {
+  0%,
+  100% {
+    height: 13px;
+  }
+  50% {
+    height: 24px;
+  }
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist {
+  font-size: 22px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progressRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.time {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  width: 52px;
+}
+
+.timeRight {
+  text-align: right;
+}
+
+.track {
+  flex: 1;
+  height: 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-text) 12%, transparent);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 6px;
+  background: var(--color-accent);
+  transition: width 0.9s linear;
+}
+
+.controlsRow {
+  position: relative;
+  display: flex;
+  /* flex-end (not center) so the skip circle's bottom edge stays flush
+     with play/favorite despite the permanent queue-count label under it in
+     .skipWrap growing that column taller than the bare circle. */
+  align-items: flex-end;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.skipWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.queueCount {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  white-space: nowrap;
+}
+
+.playBtn {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.playBtn:active {
+  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+}
+.playBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.skipBtn {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--color-divider);
+  color: var(--color-text);
+  touch-action: none;
+  user-select: none;
+}
+.skipBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.skipRing {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.skipInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.holdLabel {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.sdkError {
+  position: relative;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--color-accent-300);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.favBtn {
+  height: 88px;
+  padding: 0 26px;
+  border-radius: 44px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.favBtn:active {
+  background: color-mix(in srgb, var(--color-accent) 24%, transparent);
+}
+.favBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.favLabel {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 24px;
+}

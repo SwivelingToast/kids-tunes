@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+backend/data
+.git
+**/.env
+**/.env.*
+design_handoff_kids_jukebox
