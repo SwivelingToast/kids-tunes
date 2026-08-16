@@ -3,7 +3,7 @@ import { api } from '../../api/client';
 import { useParentUiStore } from '../../store/parentUiStore';
 import type { ApiSearchResult, ApiSong } from '../../api/types';
 import AlbumArt from '../AlbumArt';
-import { CloseIcon } from '../icons';
+import { CloseIcon, PlusIcon } from '../icons';
 import { formatDuration } from '../../lib/display';
 import styles from './SongsPanel.module.css';
 
@@ -55,6 +55,11 @@ export default function SongsPanel() {
   const removeSong = async (song: ApiSong) => {
     await api.delete(`/api/songs/${song.id}`);
     loadLibrary();
+  };
+
+  const queueSong = async (song: ApiSong) => {
+    await api.post('/api/queue', { songId: song.id });
+    flash(`${song.title} added to the queue`);
   };
 
   const toggleClass = (song: ApiSong) =>
@@ -144,6 +149,9 @@ export default function SongsPanel() {
                 <div className={styles.actionsCell}>
                   <button className={`${styles.toggleBtn} ${toggleClass(song)}`} onClick={() => toggleHidden(song)}>
                     {toggleLabel(song)}
+                  </button>
+                  <button className="btn btn-icon btn-secondary" onClick={() => queueSong(song)} aria-label="Add to queue">
+                    <PlusIcon size={15} />
                   </button>
                   <button className="btn btn-icon btn-secondary" onClick={() => removeSong(song)} aria-label="Remove from jukebox">
                     <CloseIcon size={15} />

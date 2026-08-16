@@ -86,6 +86,14 @@ export function ChevronLeftIcon({ size }: { size: number }) {
 
 // Matches the design's "Remove from jukebox"/"Remove from this playlist"/
 // queue-remove icon exactly (same path, sizes vary per call site).
+export function PlusIcon({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
 export function CloseIcon({ size }: { size: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round">
