@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'node:path';
 import { config } from './config.js';
 import { initDb } from './db/db.js';
 import { kidsRouter } from './routes/kids.js';
@@ -31,6 +32,14 @@ app.use('/api/spotify', spotifyRouter);
 // frontend through its own Vite dev server on a different port instead).
 // Mounted after the /api routes so nothing here can shadow them.
 app.use(express.static(config.staticDir));
+
+// SPA fallback: client-side routes like /admin (the remote parent-admin
+// entry point - see kidStore's isAdmin) have no matching static file, so a
+// direct navigation/reload needs index.html served for them too, same as
+// any other unknown non-API path.
+app.get(/^\/(?!api\/).*/, (_req, res) => {
+  res.sendFile(path.join(config.staticDir, 'index.html'));
+});
 
 app.listen(config.port, () => {
   // eslint-disable-next-line no-console

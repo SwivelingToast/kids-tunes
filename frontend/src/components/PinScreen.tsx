@@ -9,6 +9,7 @@ export default function PinScreen() {
   const pinError = useKidStore((s) => s.pinError);
   const pressPinKey = useKidStore((s) => s.pressPinKey);
   const exitPin = useKidStore((s) => s.exitPin);
+  const isAdmin = useKidStore((s) => s.isAdmin);
 
   return (
     <div className={styles.screen}>
@@ -35,13 +36,15 @@ export default function PinScreen() {
 
       <div className={styles.error}>{pinError}</div>
 
-      <button
-        className="btn btn-secondary"
-        onClick={exitPin}
-        style={{ position: 'relative', height: 52, padding: '0 26px', fontSize: 17, borderRadius: 'var(--radius-lg)' }}
-      >
-        Back to music
-      </button>
+      {!isAdmin && (
+        <button
+          className="btn btn-secondary"
+          onClick={exitPin}
+          style={{ position: 'relative', height: 52, padding: '0 26px', fontSize: 17, borderRadius: 'var(--radius-lg)' }}
+        >
+          Back to music
+        </button>
+      )}
     </div>
   );
 }

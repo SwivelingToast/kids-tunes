@@ -51,6 +51,10 @@ function loadSdkScript() {
 
 interface UsePlaybackSDKOptions {
   onTrackEnd: () => void;
+  // False for remote parent-admin sessions (see App.tsx / kidStore's
+  // isAdmin) - such a session never registers a Spotify Connect device at
+  // all, so it can't compete for or steal playback just by being opened.
+  enabled: boolean;
 }
 
 // Wraps Spotify's Web Playback SDK: registers this browser tab as a
@@ -62,7 +66,7 @@ interface UsePlaybackSDKOptions {
 // not yet fully indexing the new device, causing intermittent "cannot
 // reach connect device" errors. Transfer/play only ever happens in
 // response to an explicit playTrackUri() call.
-export function usePlaybackSDK({ onTrackEnd }: UsePlaybackSDKOptions) {
+export function usePlaybackSDK({ onTrackEnd, enabled }: UsePlaybackSDKOptions) {
   const [ready, setReady] = useState(false);
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
@@ -94,6 +98,7 @@ export function usePlaybackSDK({ onTrackEnd }: UsePlaybackSDKOptions) {
   }
 
   useEffect(() => {
+    if (!enabled) return;
     loadSdkScript();
 
     window.onSpotifyWebPlaybackSDKReady = () => {
@@ -175,7 +180,10 @@ export function usePlaybackSDK({ onTrackEnd }: UsePlaybackSDKOptions) {
     return () => {
       playerRef.current?.disconnect();
     };
-  }, []);
+    // `enabled` is fixed for the lifetime of the app (derived once from the
+    // URL path - see kidStore's isAdminPath), so this still only ever runs
+    // once, same as before.
+  }, [enabled]);
 
   // The SDK only fires player_state_changed on actual state transitions
   // (play/pause/seek/track change), not continuously - interpolate a

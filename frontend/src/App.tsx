@@ -9,6 +9,7 @@ import { useWakeLock } from './lib/useWakeLock';
 
 export default function App() {
   const view = useKidStore((s) => s.view);
+  const isAdmin = useKidStore((s) => s.isAdmin);
   const bindPlaybackControls = useKidStore((s) => s.bindPlaybackControls);
   const syncPlaybackState = useKidStore((s) => s.syncPlaybackState);
 
@@ -22,7 +23,11 @@ export default function App() {
   // instance stuck uninitialized forever, since nothing fires that
   // callback again. Owning it here keeps one player alive for the whole
   // session, so audio also keeps playing while a parent is in settings.
-  const sdk = usePlaybackSDK({ onTrackEnd: () => useKidStore.getState().advance() });
+  //
+  // Disabled entirely for /admin sessions (isAdmin) - a remote device only
+  // there to administrate must never register as a Spotify Connect device,
+  // or it could compete for/steal playback from the real kiosk.
+  const sdk = usePlaybackSDK({ enabled: !isAdmin, onTrackEnd: () => useKidStore.getState().advance() });
 
   useEffect(() => {
     bindPlaybackControls({
@@ -44,7 +49,7 @@ export default function App() {
 
   return (
     <KioskFrame>
-      {view === 'kid' && <KidScreen />}
+      {!isAdmin && view === 'kid' && <KidScreen />}
       {view === 'pin' && <PinScreen />}
       {view === 'parent' && <ParentScreen />}
     </KioskFrame>

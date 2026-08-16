@@ -21,6 +21,7 @@ export default function ParentScreen() {
   const parentTab = useKidStore((s) => s.parentTab);
   const setParentTab = useKidStore((s) => s.setParentTab);
   const exitParent = useKidStore((s) => s.exitParent);
+  const isAdmin = useKidStore((s) => s.isAdmin);
 
   return (
     <div className={styles.screen}>
@@ -36,7 +37,7 @@ export default function ParentScreen() {
           onClick={exitParent}
           style={{ height: 48, padding: '0 20px', fontSize: 16, borderRadius: 'var(--radius-lg)' }}
         >
-          Done — back to kids
+          {isAdmin ? 'Done — lock' : 'Done — back to kids'}
         </button>
       </div>
 
