@@ -69,3 +69,13 @@ export interface ApiSpotifyDevice {
   active: boolean;
   isKiosk: boolean;
 }
+
+export interface ApiNowPlaying {
+  active: boolean;
+  isKiosk: boolean;
+  isPlaying: boolean;
+  progressMs: number;
+  trackId: string | null;
+  deviceId: string | null;
+  deviceName: string | null;
+}

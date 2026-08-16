@@ -6,6 +6,10 @@ import ParentScreen from './components/parent/ParentScreen';
 import { useKidStore } from './store/kidStore';
 import { usePlaybackSDK } from './spotify/usePlaybackSDK';
 import { useWakeLock } from './lib/useWakeLock';
+import { api } from './api/client';
+import type { ApiNowPlaying } from './api/types';
+
+const NOW_PLAYING_POLL_MS = 3500;
 
 export default function App() {
   const view = useKidStore((s) => s.view);
@@ -28,6 +32,30 @@ export default function App() {
   // there to administrate must never register as a Spotify Connect device,
   // or it could compete for/steal playback from the real kiosk.
   const sdk = usePlaybackSDK({ enabled: !isAdmin, onTrackEnd: () => useKidStore.getState().advance() });
+
+  // Account-wide playback truth, polled only on the kiosk (not /admin
+  // sessions - see kidStore's isAdmin). The kiosk's own SDK only reports
+  // state for itself, so it goes stale/silent once playback has been cast
+  // to a different Connect device - this corrects playingId/playing/pos
+  // and activeDeviceId in that case (see applyNowPlayingPoll).
+  useEffect(() => {
+    if (isAdmin) return;
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const data = await api.get<ApiNowPlaying>('/api/spotify/now-playing');
+        if (!cancelled) useKidStore.getState().applyNowPlayingPoll(data);
+      } catch {
+        // Transient network/API hiccups just wait for the next tick.
+      }
+    };
+    poll();
+    const interval = setInterval(poll, NOW_PLAYING_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [isAdmin]);
 
   useEffect(() => {
     bindPlaybackControls({

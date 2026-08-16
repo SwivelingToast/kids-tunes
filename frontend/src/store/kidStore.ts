@@ -58,12 +58,20 @@ interface KidState {
   sdkReconnecting: boolean;
   sdkError: string | null;
 
+  // The Connect device actually hosting playback right now, when it's
+  // NOT the kiosk's own SDK device (e.g. cast to a speaker) - see
+  // applyNowPlayingPoll. Null means "nothing else active, use the kiosk's
+  // own device" (the bound controls below already default to that).
+  activeDeviceId: string | null;
+
   // Bound once from KidScreen when the SDK hook mounts. Nullable because
   // the store can exist (and tapSong/advance can theoretically fire)
-  // before the hook has had a chance to register them.
-  _playTrackUri: ((uri: string) => Promise<boolean>) | null;
-  _pausePlayback: (() => Promise<boolean>) | null;
-  _resumePlayback: (() => Promise<boolean>) | null;
+  // before the hook has had a chance to register them. The optional
+  // deviceId lets calls aim at activeDeviceId instead of always the
+  // kiosk's own device - see usePlaybackSDK.
+  _playTrackUri: ((uri: string, deviceId?: string) => Promise<boolean>) | null;
+  _pausePlayback: ((deviceId?: string) => Promise<boolean>) | null;
+  _resumePlayback: ((deviceId?: string) => Promise<boolean>) | null;
 
   tab: KidTab;
   artist: string | null;
@@ -82,9 +90,9 @@ interface KidState {
   tapSong: (id: string) => Promise<void>;
 
   bindPlaybackControls: (controls: {
-    playTrackUri: (uri: string) => Promise<boolean>;
-    pausePlayback: () => Promise<boolean>;
-    resumePlayback: () => Promise<boolean>;
+    playTrackUri: (uri: string, deviceId?: string) => Promise<boolean>;
+    pausePlayback: (deviceId?: string) => Promise<boolean>;
+    resumePlayback: (deviceId?: string) => Promise<boolean>;
   }) => void;
   syncPlaybackState: (state: {
     isPlaying: boolean;
@@ -92,6 +100,19 @@ interface KidState {
     ready: boolean;
     reconnecting: boolean;
     error: string | null;
+  }) => void;
+
+  // Fed by App.tsx polling GET /api/spotify/now-playing (kiosk sessions
+  // only) - the account-wide playback truth, used to correct playingId/
+  // playing/pos and activeDeviceId while casting to a device other than
+  // the kiosk's own, since the local SDK goes stale/silent for that case.
+  applyNowPlayingPoll: (poll: {
+    active: boolean;
+    isKiosk: boolean;
+    isPlaying: boolean;
+    progressMs: number;
+    trackId: string | null;
+    deviceId: string | null;
   }) => void;
 
   openFavorites: (songId: string) => void;
@@ -133,6 +154,7 @@ export const useKidStore = create<KidState>((set, get) => ({
   sdkReady: false,
   sdkReconnecting: false,
   sdkError: null,
+  activeDeviceId: null,
   _playTrackUri: null,
   _pausePlayback: null,
   _resumePlayback: null,
@@ -194,9 +216,9 @@ export const useKidStore = create<KidState>((set, get) => ({
   },
 
   togglePlay: async () => {
-    const { playing, playingId, queue, _pausePlayback, _resumePlayback } = get();
+    const { playing, playingId, queue, activeDeviceId, _pausePlayback, _resumePlayback } = get();
     if (playing) {
-      await _pausePlayback?.();
+      await _pausePlayback?.(activeDeviceId ?? undefined);
       return;
     }
     // Idle with a non-empty queue (e.g. after a fresh page load) has
@@ -207,7 +229,7 @@ export const useKidStore = create<KidState>((set, get) => ({
       await get().advance();
       return;
     }
-    await _resumePlayback?.();
+    await _resumePlayback?.(activeDeviceId ?? undefined);
     // isPlaying updates reactively via syncPlaybackState once the SDK
     // confirms the real state change - not set optimistically here.
   },
@@ -222,7 +244,7 @@ export const useKidStore = create<KidState>((set, get) => ({
 
     if (next?.song) {
       const id = next.song.id;
-      await get()._playTrackUri?.(`spotify:track:${id}`);
+      await get()._playTrackUri?.(`spotify:track:${id}`, get().activeDeviceId ?? undefined);
       set((s) => ({
         playingId: id,
         recent: [id, ...s.recent.filter((r) => r !== id)].slice(0, RECENT_MAX),
@@ -231,7 +253,7 @@ export const useKidStore = create<KidState>((set, get) => ({
       return;
     }
 
-    await get()._pausePlayback?.();
+    await get()._pausePlayback?.(get().activeDeviceId ?? undefined);
     set({ playingId: null });
   },
 
@@ -240,12 +262,16 @@ export const useKidStore = create<KidState>((set, get) => ({
   // must never discard a paused song or jump the line ahead of a queue).
   // Only plays immediately when truly nothing is happening: paused with an
   // empty queue, where there's nothing to interrupt or skip ahead of.
+  // `playing` here reflects account-wide truth (see applyNowPlayingPoll),
+  // not just the kiosk's own SDK state - otherwise casting to a speaker
+  // would look identical to "nothing happening" and get yanked back to
+  // the tablet the next time a song is tapped.
   tapSong: async (id) => {
     const song = get().songs.find((s) => s.id === id);
     if (!song) return;
 
     if (!get().playing && get().queue.length === 0) {
-      await get()._playTrackUri?.(`spotify:track:${id}`);
+      await get()._playTrackUri?.(`spotify:track:${id}`, get().activeDeviceId ?? undefined);
       set((s) => ({
         playingId: id,
         recent: [id, ...s.recent.filter((r) => r !== id)].slice(0, RECENT_MAX),
@@ -277,6 +303,24 @@ export const useKidStore = create<KidState>((set, get) => ({
   // pure mirroring, not another place that decides when a track ended.
   syncPlaybackState: ({ isPlaying, posSeconds, ready, reconnecting, error }) => {
     set({ playing: isPlaying, pos: posSeconds, sdkReady: ready, sdkReconnecting: reconnecting, sdkError: error });
+  },
+
+  applyNowPlayingPoll: ({ active, isKiosk, isPlaying, progressMs, trackId, deviceId }) => {
+    set({ activeDeviceId: active && !isKiosk ? deviceId : null });
+
+    // Only let the poll drive playingId/playing/pos when something else
+    // is confirmed hosting playback - when the kiosk itself is active (or
+    // nothing is active anywhere), the local SDK's own player_state_changed
+    // events are far lower-latency and stay authoritative (see
+    // syncPlaybackState) so the poll must not fight with them.
+    if (!active || isKiosk) return;
+
+    const resolved = trackId ? get().songs.find((s) => s.id === trackId) : undefined;
+    set({
+      playingId: resolved ? resolved.id : get().playingId,
+      playing: isPlaying,
+      pos: progressMs / 1000,
+    });
   },
 
   openFavorites: (songId) => set({ favTarget: songId }),

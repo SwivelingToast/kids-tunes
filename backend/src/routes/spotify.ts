@@ -100,6 +100,42 @@ spotifyRouter.get('/devices', async (_req, res) => {
   }
 });
 
+interface SpotifyPlaybackState {
+  is_playing: boolean;
+  progress_ms: number | null;
+  item: { id: string } | null;
+  device: { id: string | null; name: string } | null;
+}
+
+// GET /api/spotify/now-playing - account-wide playback truth (which device
+// is actually active, what's playing, position). Unlike the kiosk's own Web
+// Playback SDK state, this stays accurate once playback has been cast to a
+// different Connect device - the SDK only ever reports state for itself,
+// so the kiosk goes stale/silent for anything happening on another device.
+// Polled from the kiosk (see App.tsx) to correct its "now playing" display
+// and its is-anything-already-playing checks while casting elsewhere.
+spotifyRouter.get('/now-playing', async (_req, res) => {
+  try {
+    const resp = await spotifyFetch('/me/player');
+    if (resp.status === 204) {
+      return res.json({ active: false, isKiosk: false, isPlaying: false, progressMs: 0, trackId: null, deviceId: null, deviceName: null });
+    }
+    const data = (await resp.json()) as SpotifyPlaybackState;
+    const kioskDeviceId = getSpotifyStatus().device;
+    res.json({
+      active: !!data.device,
+      isKiosk: data.device?.id !== null && data.device?.id === kioskDeviceId,
+      isPlaying: data.is_playing,
+      progressMs: data.progress_ms ?? 0,
+      trackId: data.item?.id ?? null,
+      deviceId: data.device?.id ?? null,
+      deviceName: data.device?.name ?? null,
+    });
+  } catch (err) {
+    handleSpotifyError(err, res);
+  }
+});
+
 // POST /api/spotify/devices/transfer { deviceId } - moves playback to the
 // given Connect device. Deliberately omits Spotify's `play` flag (defaults
 // to false/keep-current-state) rather than forcing play:true, so casting
