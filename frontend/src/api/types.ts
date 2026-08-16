@@ -61,3 +61,11 @@ export interface ApiSpotifyStatus {
   device: string | null;
   product: string | null;
 }
+
+export interface ApiSpotifyDevice {
+  id: string | null;
+  name: string;
+  type: string;
+  active: boolean;
+  isKiosk: boolean;
+}
