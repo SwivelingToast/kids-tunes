@@ -9,6 +9,14 @@ export type ParentTab = 'songs' | 'playlists' | 'queue' | 'spotify' | 'kids' | '
 const RECENT_STORAGE_KEY = 'kids-jukebox:recent';
 const RECENT_MAX = 9;
 
+// A device reached via /admin is a remote parent-administration session,
+// not the kiosk - it skips the kid screen (and the Spotify Web Playback
+// SDK entirely, see App.tsx) and only ever shows the PIN/parent views, so
+// it can never register as a competing Connect device or steal playback
+// just by being opened. See hotfix/prevent-remote-playback-hijack for the
+// related bug this avoids re-introducing.
+const isAdminPath = window.location.pathname.replace(/\/+$/, '') === '/admin';
+
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 function loadStoredRecent(): string[] {
@@ -37,6 +45,7 @@ interface KidState {
   parentTab: ParentTab;
   pinEntry: string;
   pinError: string;
+  isAdmin: boolean;
 
   // Real Spotify player state, mirrored in from the Web Playback SDK hook
   // (see usePlaybackSDK + syncPlaybackState) - this store never drives
@@ -112,10 +121,11 @@ export const useKidStore = create<KidState>((set, get) => ({
   loading: true,
   loadError: null,
 
-  view: 'kid',
+  view: isAdminPath ? 'pin' : 'kid',
   parentTab: 'songs',
   pinEntry: '',
   pinError: '',
+  isAdmin: isAdminPath,
 
   playingId: null,
   playing: false,
@@ -330,8 +340,10 @@ export const useKidStore = create<KidState>((set, get) => ({
       });
   },
 
-  exitPin: () => set({ view: 'kid', pinEntry: '', pinError: '' }),
-  exitParent: () => set({ view: 'kid' }),
+  // An admin session has no kid screen to return to - re-lock to the PIN
+  // screen instead (still clearing the entry either way).
+  exitPin: () => set((s) => ({ view: s.isAdmin ? 'pin' : 'kid', pinEntry: '', pinError: '' })),
+  exitParent: () => set((s) => ({ view: s.isAdmin ? 'pin' : 'kid' })),
   setParentTab: (parentTab) => set({ parentTab }),
 
   flash: (message) => {

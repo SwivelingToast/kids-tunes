@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { db } from '../db/db.js';
-import { handleSpotifyError, spotifyJson, spotifyPaginate } from '../spotify/client.js';
+import { handleSpotifyError, spotifyFetch, spotifyJson, spotifyPaginate } from '../spotify/client.js';
 import { mapSpotifyTrack, type SpotifyTrack } from '../spotify/mappers.js';
 import { isInLibrary } from '../db/library.js';
+import { getSpotifyStatus } from '../spotify/tokens.js';
 
 export const spotifyRouter = Router();
 
@@ -65,6 +66,56 @@ spotifyRouter.get('/playlists', async (_req, res) => {
         linked: linkedIds.has(p.id),
       })),
     );
+  } catch (err) {
+    handleSpotifyError(err, res);
+  }
+});
+
+interface SpotifyConnectDevice {
+  id: string | null;
+  is_active: boolean;
+  name: string;
+  type: string;
+}
+
+// GET /api/spotify/devices - every Spotify Connect device currently
+// available on the account (this kiosk's own Web Playback SDK device, plus
+// anything else already on Spotify - smart speakers, phones, etc.) so a
+// parent can pick where music plays.
+spotifyRouter.get('/devices', async (_req, res) => {
+  try {
+    const data = await spotifyJson<{ devices: SpotifyConnectDevice[] }>('/me/player/devices');
+    const kioskDeviceId = getSpotifyStatus().device;
+    res.json(
+      data.devices.map((d) => ({
+        id: d.id,
+        name: d.name,
+        type: d.type,
+        active: d.is_active,
+        isKiosk: d.id !== null && d.id === kioskDeviceId,
+      })),
+    );
+  } catch (err) {
+    handleSpotifyError(err, res);
+  }
+});
+
+// POST /api/spotify/devices/transfer { deviceId } - moves playback to the
+// given Connect device. Deliberately omits Spotify's `play` flag (defaults
+// to false/keep-current-state) rather than forcing play:true, so casting
+// preserves whatever play/pause state it was already in instead of always
+// starting playback on transfer.
+spotifyRouter.post('/devices/transfer', async (req, res) => {
+  const deviceId = req.body?.deviceId;
+  if (typeof deviceId !== 'string') return res.status(400).json({ error: 'deviceId is required' });
+
+  try {
+    await spotifyFetch('/me/player', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ device_ids: [deviceId] }),
+    });
+    res.json({ ok: true });
   } catch (err) {
     handleSpotifyError(err, res);
   }
