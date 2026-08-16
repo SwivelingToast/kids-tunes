@@ -205,30 +205,44 @@ export function usePlaybackSDK({ onTrackEnd, enabled }: UsePlaybackSDKOptions) {
     return () => clearInterval(interval);
   }, []);
 
-  async function playTrackUri(uri: string): Promise<boolean> {
-    if (!deviceId) {
+  // targetDeviceId lets a caller aim this at a device other than the
+  // kiosk's own registered one - see kidStore's activeDeviceId, fed from
+  // polling /api/spotify/now-playing. Without this, any play/pause/resume
+  // issued after casting to a speaker would keep targeting the kiosk's own
+  // device and yank playback back to the tablet.
+  async function playTrackUri(uri: string, targetDeviceId?: string): Promise<boolean> {
+    const target = targetDeviceId ?? deviceId;
+    if (!target) {
       setError('No Spotify Connect device yet - the player has not finished initializing.');
       return false;
     }
     const accessToken = await getAccessToken();
 
-    // Reset immediately rather than waiting for the SDK's next
-    // player_state_changed, which lags this call by up to a couple
-    // seconds and would otherwise keep showing the previous track's stale
-    // position in the meantime.
-    progressRef.current = { position: 0, duration: 0, updatedAt: Date.now(), paused: true };
-    setPositionMs(0);
+    // The local optimistic position/end-detection reset below only makes
+    // sense when this kiosk is the device about to actually play the
+    // track - when targeting a different Connect device, its real state
+    // is tracked via polling instead (see kidStore's applyNowPlayingPoll),
+    // not this hook's own player_state_changed events.
+    const controllingLocalPlayer = target === deviceId;
+    if (controllingLocalPlayer) {
+      // Reset immediately rather than waiting for the SDK's next
+      // player_state_changed, which lags this call by up to a couple
+      // seconds and would otherwise keep showing the previous track's
+      // stale position in the meantime.
+      progressRef.current = { position: 0, duration: 0, updatedAt: Date.now(), paused: true };
+      setPositionMs(0);
 
-    isTransitioningRef.current = true;
-    // Safety net: if we never see a confirming "playing" state (e.g. a
-    // network hiccup), don't leave end-detection suppressed forever.
-    transitionTimeoutRef.current = setTimeout(clearTransitioning, 5000);
+      isTransitioningRef.current = true;
+      // Safety net: if we never see a confirming "playing" state (e.g. a
+      // network hiccup), don't leave end-detection suppressed forever.
+      transitionTimeoutRef.current = setTimeout(clearTransitioning, 5000);
+    }
 
     // This transfers playback to device_id (reclaiming it from another
     // Connect device on the account if needed) as part of the same call -
     // a separate PUT /me/player transfer call isn't required, and has been
     // observed to consistently 500 on some accounts, so it's skipped.
-    const playRes = await fetchSpotifyWithRetry(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+    const playRes = await fetchSpotifyWithRetry(`https://api.spotify.com/v1/me/player/play?device_id=${target}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ uris: [uri] }),
@@ -236,7 +250,7 @@ export function usePlaybackSDK({ onTrackEnd, enabled }: UsePlaybackSDKOptions) {
     if (!playRes.ok) {
       const body = await playRes.text().catch(() => '');
       setError(`Failed to start playback: ${playRes.status} ${body}`);
-      clearTransitioning();
+      if (controllingLocalPlayer) clearTransitioning();
       return false;
     }
 
@@ -244,12 +258,13 @@ export function usePlaybackSDK({ onTrackEnd, enabled }: UsePlaybackSDKOptions) {
     return true;
   }
 
-  async function setPaused(paused: boolean): Promise<boolean> {
-    if (!deviceId) return false;
+  async function setPaused(paused: boolean, targetDeviceId?: string): Promise<boolean> {
+    const target = targetDeviceId ?? deviceId;
+    if (!target) return false;
     const accessToken = await getAccessToken();
 
     const res = await fetchSpotifyWithRetry(
-      `https://api.spotify.com/v1/me/player/${paused ? 'pause' : 'play'}?device_id=${deviceId}`,
+      `https://api.spotify.com/v1/me/player/${paused ? 'pause' : 'play'}?device_id=${target}`,
       { method: 'PUT', headers: { Authorization: `Bearer ${accessToken}` } },
     );
     if (!res.ok) {
@@ -258,21 +273,23 @@ export function usePlaybackSDK({ onTrackEnd, enabled }: UsePlaybackSDKOptions) {
       return false;
     }
     setError(null);
-    setIsPlaying(!paused);
+    // Only reflects this hook's own (kiosk) state - a different target's
+    // real play/pause state comes from polling, not an optimistic guess.
+    if (target === deviceId) setIsPlaying(!paused);
     return true;
   }
 
   // Explicitly stop the device rather than leaving whatever was last
   // playing running orphaned when the queue runs out.
-  const pausePlayback = async () => {
-    const ok = await setPaused(true);
-    if (ok) {
+  const pausePlayback = async (targetDeviceId?: string) => {
+    const ok = await setPaused(true, targetDeviceId);
+    if (ok && (targetDeviceId ?? deviceId) === deviceId) {
       progressRef.current = { position: 0, duration: 0, updatedAt: Date.now(), paused: true };
       setPositionMs(0);
     }
     return ok;
   };
-  const resumePlayback = () => setPaused(false);
+  const resumePlayback = (targetDeviceId?: string) => setPaused(false, targetDeviceId);
 
   return {
     ready,
