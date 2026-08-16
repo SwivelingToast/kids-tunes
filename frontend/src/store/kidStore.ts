@@ -164,15 +164,15 @@ export const useKidStore = create<KidState>((set, get) => ({
         loading: false,
       });
 
-      // Idle with a non-empty queue is a dead end - nothing else in the app
-      // ever drains a queue while idle (tapSong only enqueues, it doesn't
-      // pop), and play/skip are both disabled with no current song. This
-      // happens on a fresh page load when songs were queued in an earlier
-      // session, so resolve it immediately by popping the queue's front
-      // item into "now playing" rather than leaving it stuck.
-      if (!get().playingId && get().queue.length > 0) {
-        await get().advance();
-      }
+      // Deliberately does NOT auto-advance an idle-but-queued state here.
+      // Every fresh page load starts with local playingId=null, so any
+      // device loading the app while the shared queue is non-empty would
+      // otherwise silently pop the real server-side queue and start
+      // playback through *that device's own* Spotify Connect id - e.g. a
+      // parent opening the site on their phone stealing/corrupting the
+      // kiosk's playback just by loading the page. Idle-with-a-queue is
+      // instead a normal, tap-to-resume state (see togglePlay) so the
+      // kiosk itself isn't left stuck without relying on this.
     } catch (err) {
       set({ loading: false, loadError: err instanceof Error ? err.message : 'Could not reach the jukebox server.' });
     }
@@ -184,9 +184,20 @@ export const useKidStore = create<KidState>((set, get) => ({
   },
 
   togglePlay: async () => {
-    const { playing, _pausePlayback, _resumePlayback } = get();
-    if (playing) await _pausePlayback?.();
-    else await _resumePlayback?.();
+    const { playing, playingId, queue, _pausePlayback, _resumePlayback } = get();
+    if (playing) {
+      await _pausePlayback?.();
+      return;
+    }
+    // Idle with a non-empty queue (e.g. after a fresh page load) has
+    // nothing loaded in the player to resume - start the queue instead.
+    // This is the deliberate, tap-triggered replacement for the old
+    // auto-advance-on-load behavior (see loadAll).
+    if (!playingId && queue.length > 0) {
+      await get().advance();
+      return;
+    }
+    await _resumePlayback?.();
     // isPlaying updates reactively via syncPlaybackState once the SDK
     // confirms the real state change - not set optimistically here.
   },
