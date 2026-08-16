@@ -57,7 +57,19 @@ export default function NowPlayingBar() {
   const favoritingKids = song ? kids.filter((k) => (favorites[k.id] ?? []).includes(song.id)) : [];
   const pct = song ? Math.min(100, (pos / song.durationSecs) * 100) : 0;
   const controlsEnabled = !!song && sdkReady;
-  const kickerText = !song ? '' : !sdkReady ? 'Connecting…' : playing ? 'Now playing' : 'Paused';
+  // The play button additionally doubles as "resume the queue" when idle
+  // with nothing loaded - see kidStore's togglePlay. Skip stays gated on
+  // controlsEnabled since there's nothing loaded to skip in that state.
+  const playEnabled = controlsEnabled || (sdkReady && !song && queueCount > 0);
+  const kickerText = song
+    ? !sdkReady
+      ? 'Connecting…'
+      : playing
+        ? 'Now playing'
+        : 'Paused'
+    : queueCount > 0
+      ? 'Paused'
+      : '';
 
   return (
     <div className={styles.bar}>
@@ -68,7 +80,7 @@ export default function NowPlayingBar() {
         {song ? (
           <AlbumArt key={song.id} song={song} iconSize={58} className={styles.art} />
         ) : (
-          <div className={styles.artIdle}>Pick a song!</div>
+          <div className={styles.artIdle}>{queueCount > 0 ? 'Tap play to resume' : 'Pick a song!'}</div>
         )}
         <div className={styles.textCol}>
           <div className={styles.kickerRow}>
@@ -95,7 +107,7 @@ export default function NowPlayingBar() {
       </div>
 
       <div className={styles.controlsRow}>
-        <button className={styles.playBtn} onClick={togglePlay} aria-label="Play or pause" disabled={!controlsEnabled}>
+        <button className={styles.playBtn} onClick={togglePlay} aria-label="Play or pause" disabled={!playEnabled}>
           {playing ? <PauseIcon size={38} /> : <PlayIcon size={40} />}
         </button>
 
