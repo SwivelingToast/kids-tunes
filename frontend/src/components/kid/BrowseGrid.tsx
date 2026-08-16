@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useKidStore } from '../../store/kidStore';
 import type { ApiSong } from '../../api/types';
 import { ChevronLeftIcon, StarIcon } from '../icons';
@@ -8,6 +8,11 @@ import styles from './BrowseGrid.module.css';
 type Tile =
   | { kind: 'song'; song: ApiSong; starred: boolean }
   | { kind: 'artist'; name: string; count: number; artUrl: string | null; artId: string };
+
+// Long enough to be clearly deliberate (not a normal tap), short enough to
+// not feel unresponsive - matches the general feel of the skip-hold gesture
+// in NowPlayingBar.
+const LONG_PRESS_MS = 500;
 
 export default function BrowseGrid() {
   const tab = useKidStore((s) => s.tab);
@@ -20,6 +25,44 @@ export default function BrowseGrid() {
   const favorites = useKidStore((s) => s.favorites);
   const songs = useKidStore((s) => s.songs);
   const tapSong = useKidStore((s) => s.tapSong);
+  const openFavorites = useKidStore((s) => s.openFavorites);
+
+  // A long press opens the favorites picker instead of tapping/queuing the
+  // song - tracked in a ref (not state) since it only needs to suppress the
+  // click that follows the same pointer sequence, not trigger a re-render.
+  const longPressFired = useRef(false);
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (pressTimer.current) clearTimeout(pressTimer.current);
+    },
+    [],
+  );
+
+  const startLongPress = (songId: string) => {
+    longPressFired.current = false;
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    pressTimer.current = setTimeout(() => {
+      longPressFired.current = true;
+      openFavorites(songId);
+    }, LONG_PRESS_MS);
+  };
+
+  const cancelLongPress = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+
+  const handleTileClick = (songId: string) => {
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return;
+    }
+    tapSong(songId);
+  };
 
   const findSong = (id: string) => songs.find((s) => s.id === id);
   const isStarred = (id: string) => kids.some((k) => (favorites[k.id] ?? []).includes(id));
@@ -92,7 +135,15 @@ export default function BrowseGrid() {
       <div className={styles.grid}>
         {tiles.map((tile) =>
           tile.kind === 'song' ? (
-            <button key={tile.song.id} className={styles.tile} onClick={() => tapSong(tile.song.id)}>
+            <button
+              key={tile.song.id}
+              className={styles.tile}
+              onPointerDown={() => startLongPress(tile.song.id)}
+              onPointerUp={cancelLongPress}
+              onPointerLeave={cancelLongPress}
+              onPointerCancel={cancelLongPress}
+              onClick={() => handleTileClick(tile.song.id)}
+            >
               <AlbumArt song={tile.song} iconSize={46} iconOpacity={0.3} className={styles.tileArt}>
                 {tile.starred && (
                   <span className={styles.badge}>

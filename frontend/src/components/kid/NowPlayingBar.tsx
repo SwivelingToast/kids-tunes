@@ -132,7 +132,12 @@ export default function NowPlayingBar() {
 
         <div className={styles.spacer} />
 
-        <button className={styles.favBtn} onClick={openFavorites} aria-label="Add to favorites" disabled={!song}>
+        <button
+          className={styles.favBtn}
+          onClick={() => song && openFavorites(song.id)}
+          aria-label="Add to favorites"
+          disabled={!song}
+        >
           <StarIcon
             size={36}
             filled={favoritingKids.length > 0}

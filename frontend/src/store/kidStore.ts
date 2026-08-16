@@ -60,7 +60,7 @@ interface KidState {
   artist: string | null;
   favKid: string | null;
 
-  showFav: boolean;
+  favTarget: string | null;
   toast: string;
 
   currentSong: () => ApiSong | null;
@@ -85,7 +85,7 @@ interface KidState {
     error: string | null;
   }) => void;
 
-  openFavorites: () => void;
+  openFavorites: (songId: string) => void;
   closeFavorites: () => void;
   toggleFavorite: (kidId: string) => Promise<void>;
 
@@ -131,7 +131,7 @@ export const useKidStore = create<KidState>((set, get) => ({
   artist: null,
   favKid: null,
 
-  showFav: false,
+  favTarget: null,
   toast: '',
 
   currentSong: () => get().songs.find((s) => s.id === get().playingId) ?? null,
@@ -258,24 +258,24 @@ export const useKidStore = create<KidState>((set, get) => ({
     set({ playing: isPlaying, pos: posSeconds, sdkReady: ready, sdkReconnecting: reconnecting, sdkError: error });
   },
 
-  openFavorites: () => set({ showFav: true }),
-  closeFavorites: () => set({ showFav: false }),
+  openFavorites: (songId) => set({ favTarget: songId }),
+  closeFavorites: () => set({ favTarget: null }),
 
   toggleFavorite: async (kidId) => {
-    const { playingId, favorites, kids } = get();
-    if (!playingId) return;
+    const { favTarget, favorites, kids } = get();
+    if (!favTarget) return;
     const kid = kids.find((k) => k.id === kidId);
     if (!kid) return;
     const current = favorites[kidId] ?? [];
-    const has = current.includes(playingId);
+    const has = current.includes(favTarget);
 
     if (has) {
-      await api.delete(`/api/kids/${kidId}/favorites/${playingId}`);
+      await api.delete(`/api/kids/${kidId}/favorites/${favTarget}`);
     } else {
-      await api.post(`/api/kids/${kidId}/favorites`, { songId: playingId });
+      await api.post(`/api/kids/${kidId}/favorites`, { songId: favTarget });
     }
-    const next = has ? current.filter((id) => id !== playingId) : [...current, playingId];
-    set({ favorites: { ...favorites, [kidId]: next }, showFav: false });
+    const next = has ? current.filter((id) => id !== favTarget) : [...current, favTarget];
+    set({ favorites: { ...favorites, [kidId]: next }, favTarget: null });
     get().flash(has ? `Removed from ${kid.name}'s favorites` : `Saved to ${kid.name}'s favorites`);
   },
 

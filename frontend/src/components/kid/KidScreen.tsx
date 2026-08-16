@@ -9,7 +9,7 @@ import HiddenCornerTrigger from './HiddenCornerTrigger';
 import styles from './KidScreen.module.css';
 
 export default function KidScreen() {
-  const showFav = useKidStore((s) => s.showFav);
+  const favTarget = useKidStore((s) => s.favTarget);
   const loading = useKidStore((s) => s.loading);
   const loadError = useKidStore((s) => s.loadError);
   const songCount = useKidStore((s) => s.songs.length);
@@ -59,7 +59,7 @@ export default function KidScreen() {
       <TabRow />
       <BrowseGrid />
       <Toast />
-      {showFav && <FavoritesModal />}
+      {favTarget && <FavoritesModal />}
       <HiddenCornerTrigger />
     </div>
   );

@@ -3,7 +3,7 @@ import { StarIcon } from '../icons';
 import styles from './FavoritesModal.module.css';
 
 export default function FavoritesModal() {
-  const song = useKidStore((s) => s.currentSong());
+  const song = useKidStore((s) => s.songs.find((x) => x.id === s.favTarget) ?? null);
   const kids = useKidStore((s) => s.kids);
   const favorites = useKidStore((s) => s.favorites);
   const toggleFavorite = useKidStore((s) => s.toggleFavorite);

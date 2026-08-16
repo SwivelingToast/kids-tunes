@@ -91,6 +91,10 @@
   gap: 10px;
   color: var(--color-text);
   transition: transform 0.12s ease;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .tile:active {
   transform: scale(0.96);
