@@ -9,7 +9,8 @@ import { useWakeLock } from './lib/useWakeLock';
 import { api } from './api/client';
 import type { ApiNowPlaying } from './api/types';
 
-const NOW_PLAYING_POLL_MS = 3500;
+const NOW_PLAYING_POLL_MS = 2000;
+const REMOTE_POSITION_TICK_MS = 500;
 
 export default function App() {
   const view = useKidStore((s) => s.view);
@@ -55,6 +56,17 @@ export default function App() {
       cancelled = true;
       clearInterval(interval);
     };
+  }, [isAdmin]);
+
+  // Interpolates `pos` between now-playing poll ticks (2s apart) the same
+  // way the local SDK hook already interpolates between its own events -
+  // without this the progress bar only advances in visible jumps while
+  // casting. A no-op whenever the kiosk itself is hosting playback (see
+  // tickRemoteNowPlaying).
+  useEffect(() => {
+    if (isAdmin) return;
+    const interval = setInterval(() => useKidStore.getState().tickRemoteNowPlaying(), REMOTE_POSITION_TICK_MS);
+    return () => clearInterval(interval);
   }, [isAdmin]);
 
   useEffect(() => {
