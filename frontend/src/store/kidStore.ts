@@ -64,6 +64,13 @@ interface KidState {
   // own device" (the bound controls below already default to that).
   activeDeviceId: string | null;
 
+  // Last poll's position snapshot, used to interpolate `pos` smoothly
+  // between poll ticks (see tickRemoteNowPlaying) the same way the local
+  // SDK hook interpolates between its own player_state_changed events -
+  // without this, the progress bar only jumps once per poll. Null when
+  // the kiosk itself is hosting playback (its own SDK ticks pos instead).
+  remoteNowPlayingBase: { progressMs: number; isPlaying: boolean; updatedAt: number } | null;
+
   // Bound once from KidScreen when the SDK hook mounts. Nullable because
   // the store can exist (and tapSong/advance can theoretically fire)
   // before the hook has had a chance to register them. The optional
@@ -115,6 +122,11 @@ interface KidState {
     deviceId: string | null;
   }) => void;
 
+  // Called on a short local interval (see App.tsx) to interpolate `pos`
+  // from remoteNowPlayingBase between poll ticks - a no-op whenever the
+  // kiosk itself is hosting playback (base is null in that case).
+  tickRemoteNowPlaying: () => void;
+
   openFavorites: (songId: string) => void;
   closeFavorites: () => void;
   toggleFavorite: (kidId: string) => Promise<void>;
@@ -155,6 +167,7 @@ export const useKidStore = create<KidState>((set, get) => ({
   sdkReconnecting: false,
   sdkError: null,
   activeDeviceId: null,
+  remoteNowPlayingBase: null,
   _playTrackUri: null,
   _pausePlayback: null,
   _resumePlayback: null,
@@ -313,14 +326,25 @@ export const useKidStore = create<KidState>((set, get) => ({
     // nothing is active anywhere), the local SDK's own player_state_changed
     // events are far lower-latency and stay authoritative (see
     // syncPlaybackState) so the poll must not fight with them.
-    if (!active || isKiosk) return;
+    if (!active || isKiosk) {
+      set({ remoteNowPlayingBase: null });
+      return;
+    }
 
     const resolved = trackId ? get().songs.find((s) => s.id === trackId) : undefined;
     set({
       playingId: resolved ? resolved.id : get().playingId,
       playing: isPlaying,
       pos: progressMs / 1000,
+      remoteNowPlayingBase: { progressMs, isPlaying, updatedAt: Date.now() },
     });
+  },
+
+  tickRemoteNowPlaying: () => {
+    const base = get().remoteNowPlayingBase;
+    if (!base || !base.isPlaying) return;
+    const elapsed = Date.now() - base.updatedAt;
+    set({ pos: (base.progressMs + elapsed) / 1000 });
   },
 
   openFavorites: (songId) => set({ favTarget: songId }),
