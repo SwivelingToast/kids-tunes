@@ -100,6 +100,19 @@
   transform: scale(0.96);
 }
 
+.tileFlash .tileArt {
+  animation: tileFlashPulse 0.65s ease-out;
+}
+
+@keyframes tileFlashPulse {
+  0% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 85%, transparent);
+  }
+  100% {
+    box-shadow: var(--shadow-sm);
+  }
+}
+
 .tileArt {
   position: relative;
   width: 100%;

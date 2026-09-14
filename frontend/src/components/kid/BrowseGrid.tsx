@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useKidStore } from '../../store/kidStore';
 import type { ApiSong } from '../../api/types';
 import { ChevronLeftIcon, StarIcon } from '../icons';
@@ -14,6 +14,9 @@ type Tile =
 // in NowPlayingBar.
 const LONG_PRESS_MS = 500;
 
+// How long the "just added" border flash stays visible on a tile.
+const FLASH_DURATION_MS = 650;
+
 export default function BrowseGrid() {
   const tab = useKidStore((s) => s.tab);
   const artist = useKidStore((s) => s.artist);
@@ -26,6 +29,7 @@ export default function BrowseGrid() {
   const songs = useKidStore((s) => s.songs);
   const tapSong = useKidStore((s) => s.tapSong);
   const openFavorites = useKidStore((s) => s.openFavorites);
+  const lastAdded = useKidStore((s) => s.lastAdded);
 
   // A long press opens the favorites picker instead of tapping/queuing the
   // song - tracked in a ref (not state) since it only needs to suppress the
@@ -39,6 +43,22 @@ export default function BrowseGrid() {
     },
     [],
   );
+
+  // Briefly flashes the border of whichever tile was just tapped, as
+  // confirmation that the tap registered - most useful for the "added to
+  // the queue" case, which otherwise has no visible change on this screen.
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!lastAdded) return;
+    setFlashId(lastAdded.id);
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setFlashId(null), FLASH_DURATION_MS);
+    return () => {
+      if (flashTimer.current) clearTimeout(flashTimer.current);
+    };
+  }, [lastAdded]);
 
   const startLongPress = (songId: string) => {
     longPressFired.current = false;
@@ -137,7 +157,7 @@ export default function BrowseGrid() {
           tile.kind === 'song' ? (
             <button
               key={tile.song.id}
-              className={styles.tile}
+              className={`${styles.tile} ${tile.song.id === flashId ? styles.tileFlash : ''}`}
               onPointerDown={() => startLongPress(tile.song.id)}
               onPointerUp={cancelLongPress}
               onPointerLeave={cancelLongPress}
