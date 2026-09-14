@@ -19,6 +19,15 @@ const isAdminPath = window.location.pathname.replace(/\/+$/, '') === '/admin';
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
+// Kids tapping rapidly can otherwise flood the queue with dozens of songs
+// in a few seconds (tapSong enqueues once something's already playing/
+// queued). A short global cooldown after any accepted tap makes a
+// frantic burst register only the first one - plain module state (like
+// toastTimer above), not store state, since it's an internal guard that
+// nothing renders off directly.
+const TAP_COOLDOWN_MS = 800;
+let lastTapAt = 0;
+
 function loadStoredRecent(): string[] {
   try {
     const raw = localStorage.getItem(RECENT_STORAGE_KEY);
@@ -86,6 +95,12 @@ interface KidState {
 
   favTarget: string | null;
   toast: string;
+
+  // Set whenever tapSong accepts a tap (plays or enqueues) so BrowseGrid
+  // can briefly flash that tile's border as confirmation - the nonce
+  // (not just the song id) makes tapping the *same* song twice in a row
+  // still re-trigger the flash, since a plain id wouldn't visibly change.
+  lastAdded: { id: string; nonce: number } | null;
 
   currentSong: () => ApiSong | null;
 
@@ -178,6 +193,7 @@ export const useKidStore = create<KidState>((set, get) => ({
 
   favTarget: null,
   toast: '',
+  lastAdded: null,
 
   currentSong: () => get().songs.find((s) => s.id === get().playingId) ?? null,
 
@@ -283,11 +299,24 @@ export const useKidStore = create<KidState>((set, get) => ({
     const song = get().songs.find((s) => s.id === id);
     if (!song) return;
 
+    // Global rate limit, not per-song - kids tapping rapidly across many
+    // different tiles would otherwise still flood the queue even with a
+    // per-song guard. Blocked taps get their own toast rather than being
+    // silently dropped, so a frantic tap doesn't look like the app just
+    // ignored it.
+    const now = Date.now();
+    if (now - lastTapAt < TAP_COOLDOWN_MS) {
+      get().flash('Please wait a moment…');
+      return;
+    }
+    lastTapAt = now;
+
     if (!get().playing && get().queue.length === 0) {
       await get()._playTrackUri?.(`spotify:track:${id}`, get().activeDeviceId ?? undefined);
       set((s) => ({
         playingId: id,
         recent: [id, ...s.recent.filter((r) => r !== id)].slice(0, RECENT_MAX),
+        lastAdded: { id, nonce: s.lastAdded ? s.lastAdded.nonce + 1 : 1 },
       }));
       localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(get().recent));
       get().flash(`Playing ${song.title}`);
@@ -296,6 +325,7 @@ export const useKidStore = create<KidState>((set, get) => ({
 
     await api.post('/api/queue', { songId: id });
     await get().refreshQueue();
+    set((s) => ({ lastAdded: { id, nonce: s.lastAdded ? s.lastAdded.nonce + 1 : 1 } }));
     get().flash(`${song.title} added to the queue`);
   },
 
