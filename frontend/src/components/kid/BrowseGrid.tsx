@@ -14,8 +14,9 @@ type Tile =
 // in NowPlayingBar.
 const LONG_PRESS_MS = 500;
 
-// How long the "just added" border flash stays visible on a tile.
-const FLASH_DURATION_MS = 650;
+// How long the "just added" border flash stays visible on a tile - must
+// match the tileFlashPulse animation duration in BrowseGrid.module.css.
+const FLASH_DURATION_MS = 1000;
 
 export default function BrowseGrid() {
   const tab = useKidStore((s) => s.tab);
