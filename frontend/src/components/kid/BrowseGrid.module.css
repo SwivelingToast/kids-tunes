@@ -101,12 +101,17 @@
 }
 
 .tileFlash .tileArt {
-  animation: tileFlashPulse 0.65s ease-out;
+  animation: tileFlashPulse 1s ease-out;
 }
 
 @keyframes tileFlashPulse {
-  0% {
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 85%, transparent);
+  /* Holds at full brightness for the first ~25% instead of fading
+     immediately, so a quick glance actually catches it - especially
+     important since this needs to stay noticeable even amid a burst of
+     other rapid taps. */
+  0%,
+  25% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent) 90%, transparent);
   }
   100% {
     box-shadow: var(--shadow-sm);
